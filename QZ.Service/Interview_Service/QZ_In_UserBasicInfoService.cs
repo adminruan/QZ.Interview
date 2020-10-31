@@ -1,0 +1,77 @@
+﻿using Microsoft.EntityFrameworkCore;
+using QZ.Interface.Interview_IService;
+using QZ.Model.DBContext;
+using QZ.Model.Expand;
+using QZ.Model.Interview;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace QZ.Service.Interview_Service
+{
+    public class QZ_In_UserBasicInfoService : BaseService, QZ_In_IUserBasicInfoService
+    {
+        private readonly DbSet<QZ_Model_In_UserBasicInfo> _UserBasicInfos;
+        public QZ_In_UserBasicInfoService(Interview_DB_EFContext dbContext) : base(dbContext)
+        {
+            this._UserBasicInfos = dbContext.UserBasicInfos;
+        }
+
+        #region 读取
+        /// <summary>
+        /// 根据用户ID获取基本信息
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public QZ_Model_In_UserBasicInfo GetBasicInfo(int uid)
+        {
+            return _UserBasicInfos.FirstOrDefault(p => p.UserID == uid);
+        }
+        #endregion
+
+        #region 写入
+        /// <summary>
+        /// 提交用户基本信息
+        /// </summary>
+        /// <param name="info">带保存的基本信息</param>
+        /// <param name="basicInfo">返回基本信息</param>
+        /// <returns></returns>
+        public bool SubmitBasicInfo(Interview_UserBasicInfo info, out QZ_Model_In_UserBasicInfo basicInfo)
+        {
+            QZ_Model_In_UserBasicInfo model = new QZ_Model_In_UserBasicInfo();
+            model.UserID = info.UserID;
+            model.RealName = info.RealName;
+            model.Gender = info.Gender;
+            model.Nation = info.Nation;
+            model.Education = info.Education;
+            model.IdentityNumber = info.IdentityNumber;
+            model.BirthDate = info.BirthDate;
+            model.Age = info.Age;
+            model.Marriage = info.Marriage;
+            model.NativePlace = info.NativePlace;
+            model.Farmer = info.Farmer;
+            model.Moblie = info.Moblie;
+            model.WechatID = info.WechatID;
+            model.EmergencyContact = info.EmergencyContact;
+            model.EmergencyMobile = info.EmergencyMobile;
+            model.Educations = info.EducationsJson;
+            model.Jobs = info.JobsJson;
+            model.ApplyJob = info.ApplyJob;
+            model.ExpectSalary = info.ExpectSalary;
+            model.LowSalary = info.LowSalary;
+            model.ArriveTime = info.ArriveTime;
+            model.ResumeSource = info.ResumeSource;
+            model.AddTime = DateTime.Now;
+            model.Updatetime = DateTime.Now;
+            if (base.Insert(model).ID > 0)
+            {
+                basicInfo = model;
+                return true;
+            }
+            basicInfo = null;
+            return false;
+        }
+        #endregion
+    }
+}

@@ -1,0 +1,65 @@
+﻿@using QZ.Model.Interview
+@using Microsoft.AspNetCore.Html
+@using System.Text;
+
+@model List<QZ_Model_In_Menu>
+@functions{
+    StringBuilder sb = new StringBuilder();
+    public IHtmlContent GetMenus(List<QZ_Model_In_Menu> menus)
+    {
+        DealMenus(menus);
+        return new HtmlString(sb.ToString());
+    }
+
+    public void DealMenus(List<QZ_Model_In_Menu> menus)
+    {
+        menus = menus.OrderBy(p => p.SortNumber).ThenBy(p => p.ID).ToList();
+        foreach (var item in menus)
+        {
+            //获取子菜单
+            if (item.ParentID <= 0)
+            {
+                //顶级菜单
+                sb.Append("<li class='layui-nav-item'>");
+                if (!string.IsNullOrEmpty(item.PathUrl))
+                {
+                    sb.Append("<a lay-href='" + item.PathUrl + "' lay-tips='" + item.MenuName + "'lay-direction='" + item.ID + "'>");
+                }
+                else
+                {
+                    sb.Append("<a href='javascript:;' lay-tips='" + item.MenuName + "'lay-direction='" + item.ID + "'>");
+                }
+                sb.Append("<i class='" + item.Icon + "'></i>");
+                sb.Append("<cite>" + item.MenuName + "</cite>");
+                sb.Append("</a>");
+                if (menus.Any(p => p.ParentID == item.ID))
+                {
+                    DealMenus(menus.Where(p => p.ParentID == item.ID).ToList());
+                }
+                sb.Append("</li>");
+            }
+            else
+            {
+                //子级菜单
+                sb.Append(" <dl class='layui-nav-child'>");
+                sb.Append("<dd>");
+                if (!string.IsNullOrEmpty(item.PathUrl))
+                {
+                    sb.Append("<a lay-href='" + item.PathUrl + "'>" + item.MenuName + "</a>");
+                }
+                else
+                {
+                    sb.Append("<i class='" + item.Icon + "'></i>");
+                    sb.Append("<a href='javascript:;'>" + item.MenuName + "</a>");
+                }
+                if (menus.Any(p => p.ParentID == item.ID))
+                {
+                    DealMenus(menus.Where(p => p.ParentID == item.ID).ToList());
+                }
+                sb.Append("</dd>");
+                sb.Append("</dl>");
+            }
+        }
+    }
+}
+@GetMenus(Model);

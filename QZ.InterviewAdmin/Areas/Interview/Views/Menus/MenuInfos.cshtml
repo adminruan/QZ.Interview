@@ -1,0 +1,207 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>菜单信息</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <style>
+        /*悬停样式*/
+        .hoverStyle:hover {
+            color: #0094ff;
+            position: relative;
+        }
+
+        .hoverStyle:after {
+            content: "";
+            width: 0;
+            height: 1px;
+            background: #0094ff;
+            position: absolute;
+            top: 100%;
+            left: 0%;
+            transition: all .8s;
+        }
+
+        .hoverStyle:hover:after {
+            left: 0%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        菜单列表
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="PID" id="PID" placeholder="请输入菜单父级ID" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="MenuName" id="MenuName" placeholder="请输入菜单名称" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-form">
+                                    <select id="Status" name="Status">
+                                        <option value="" selected>请选择状态</option>
+                                        <option value="0">启用</option>
+                                        <option value="1">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="layui-btn layui-btn-md layui-bg-green" id="btn-search" onclick="active.search()"> <i class="layui-icon">&#xe615;</i> 搜索</button>
+                        </div>
+                        <div class="layui-row">
+                            <table id="tab-menu" lay-filter="lay-menu"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*头部工具栏*@
+    <script type="text/html" id="toolbar">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i>添加</button>
+            <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="active.goback();"><i class="layui-icon">&#xe65c;</i>返回</button>
+        </div>
+    </script>
+    @*行内工具*@
+    <script type="text/html" id="inlinebar">
+        <a class="layui-btn layui-btn-sm" lay-event="e-update" style="line-height:28px">编辑</a>
+    </script>
+
+    <script type="text/javascript">
+        var $, layer, table;
+        layui.use(['layer', 'table', 'form', 'laydate'], function () {
+            var form = layui.form
+                , laydate = layui.laydate;
+            $ = layui.jquery, layer = layui.layer, table = layui.table;
+            //初始化
+            active.setTab(0);
+            //监听工具条
+            table.on('tool(lay-menu)', function (obj) {
+                var d = obj.data;
+                var event = obj.event;
+                switch (event) {
+                    case 'e-update':
+                        data.pid = d.ParentID;
+                        active.openedit(d.ParentID, d.ID);
+                        break;
+                    default:
+                        layer.msg("无对应事件");
+                        break;
+                }
+                return;
+            });
+        });
+
+        //用于存储当前页面数据
+        var data = {
+            pid: 0,
+        };
+
+        //定义相关事件
+        var active = {
+            setTab: function (pid) {
+                table.render({
+                    elem: '#tab-menu'
+                    , id: 'tab-menu'
+                    , url: '/Interview/Menus/GetMenuInfos' //数据接口
+                    , title: '菜单列表'
+                    , page: true //开启分页
+                    , limit: 20
+                    , limits: [20, 50, 100]
+                    , where: { 'menuName': $('#MenuName').val(), 'status': $('#Status').val(), 'pid': pid }
+                    , toolbar: '#toolbar'
+                    , cols: [[ //表头
+                        { field: 'ID', sort: true, title: '编号', align: 'center' }
+                        , { field: 'MenuName', title: '菜单名称', align: 'center', templet: function (d) { return '<a target="_blank" class="hoverStyle" title="查看子菜单" onclick="active.subset(' + d.ID + ')"><i class="layui-icon layui-icon-template-1"> </i>' + d.MenuName + '</a>' } }
+                        , { field: 'PathUrl', title: '菜单地址', align: 'center', templet: function (d) { return (d.PathUrl == '' || d.PathUrl == ' ' || d.PathUrl == null) ? "--" : d.PathUrl; } }
+                        , { field: 'SortNumber', title: '排序序号', align: 'center' }
+                        , {
+                            field: 'Status', title: '状态', align: 'center', templet: function (d) {
+                                switch (d.Status) {
+                                    case 0:
+                                        return "<span style='color:#5fb878;'>启用</span>";
+                                    case 1:
+                                        return "<span style='color:#c9c9c9;'>禁用</span>";
+                                    default:
+                                        return "<span>未知</span>";
+                                }
+                            }
+                        }
+                        , { field: 'CreateTime', title: '增添时间', align: 'center' }
+                        , { fixed: '', title: '管理操作', align: 'center', toolbar: '#inlinebar' }
+                    ]]
+                });
+            },
+            //搜索事件
+            search: function () {
+                var that = this;
+                if ($('#PID').val()) {
+                    data.pid = $('#PID').val();
+                }
+                that.setTab(data.pid);
+            },
+            //查看子集
+            subset: function (pid) {
+                var that = this;
+                data.pid = pid;
+                that.setTab(data.pid);
+            },
+            //返回上一层
+            goback: function () {
+                var that = this;
+                if (data.pid != null && data.pid > 0) {
+                    $.ajax({
+                        url: '/Interview/Menus/GetParentIDByID',
+                        method: 'GET',
+                        data: { 'id': data.pid },
+                        success: function (p) {
+                            data.pid = p;
+                            that.setTab(data.pid);
+                        },
+                        fail: function () {
+                            layer.msg('未知错误，请联系管理员');
+                        }
+                    });
+                }
+            },
+            //打开编辑窗口
+            openedit: function (pid, id) {
+                layer.open({
+                    type: 2,
+                    closeBtn: 2,
+                    title: '菜单编辑',
+                    area: ['550px', '390px'],
+                    content: '/Interview/Menus/MenuEdit?id=' + id + '&pid=' + data.pid,
+                    end: function () {
+                    }
+                });
+            }
+        };
+
+        //关闭
+        function Close() {
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+        };
+    </script>
+</body>
+</html>
