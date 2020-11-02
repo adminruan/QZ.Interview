@@ -19,9 +19,9 @@ namespace QZ.Service
         private static readonly object o = new object();
         protected DbContext _DbContext { get; private set; }
 
-        public BaseService(DbContext contextRead)
+        public BaseService(DbContext context)
         {
-            this._DbContext = contextRead;
+            this._DbContext = context;
         }
         #endregion Identity
 

@@ -1,4 +1,5 @@
-﻿using QZ.Model.Interview;
+﻿using QZ.Common.Enums;
+using QZ.Model.Interview;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,15 @@ namespace QZ.Interface.Interview_IService
         /// <param name="adminID">负责处理管理员ID</param>
         /// <returns></returns>
         bool SubmitInterviewRecord(int uid, int adminID);
+        
+        /// <summary>
+        /// 更新下轮面试人
+        /// </summary>
+        /// <param name="records">面试记录</param>
+        /// <param name="adminID">面试官管理员ID</param>
+        /// <param name="schedules">下轮面进度</param>
+        /// <returns></returns>
+        bool ArrangeInterviewer(QZ_Model_In_InterviewRecords records, int adminID, QZ_Enum_Schedules schedules);
         #endregion
 
         #region 读取

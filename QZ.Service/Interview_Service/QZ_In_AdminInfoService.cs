@@ -38,6 +38,20 @@ namespace QZ.Service.Interview_Service
         {
             return QZ_Helper_URLUtils.UrlEncode(QZ_Helper_Encryption.DES_Encode(QZ_Helper_Encryption.Get32MD5String(adminInfo.UserName + adminInfo.AdminID), QZ_Helper_Encryption.Get32MD5String(adminInfo.CreateTime.ToString())));
         }
+
+        /// <summary>
+        /// 获取管理员列表
+        /// </summary>
+        /// <returns></returns>
+        public List<QZ_Model_In_AdminInfo> GetAdminList()
+        {
+            return _AdminInfos.Where(p => p.Status == 0).Select(p => new QZ_Model_In_AdminInfo
+            {
+                AdminID = p.AdminID,
+                RealName = p.RealName,
+                Position = p.Position
+            }).OrderBy(p => p.RealName).ToList();
+        }
         #endregion
     }
 }

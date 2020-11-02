@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\QZ.Common\QZ.Common.csproj" />
     <ProjectReference Include="..\QZ.Model\QZ.Model.csproj" />
   </ItemGroup>
 

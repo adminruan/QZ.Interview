@@ -44,6 +44,21 @@ namespace QZ.Model.Interview
         /// 面试管理员ID
         /// 多个用‘|’隔开
         /// </summary>
-        public string InterviewerAdminIds { get; set; }        
+        public string InterviewerAdminIds { get; set; }
+        
+        /// <summary>
+        /// 转正薪资
+        /// </summary>
+        public decimal? RealOffer { get; set; }
+
+        /// <summary>
+        /// 试用薪资
+        /// </summary>
+        public decimal? TryOffer { get; set; }
+
+        /// <summary>
+        /// 入职时间
+        /// </summary>
+        public DateTime? EntryTime { get; set; }
     }
 }

@@ -39,6 +39,32 @@ namespace QZ.Service.Interview_Service
             record.InterviewerAdminIds = $"{adminID}|";
             return base.Insert(record).ID > 0;
         }
+
+        /// <summary>
+        /// 分配下轮面试人
+        /// </summary>
+        /// <param name="records">面试申请记录</param>
+        /// <param name="adminID">面试官ID</param>
+        /// <param name="schedules">下轮面进度</param>
+        /// <returns></returns>
+        public bool ArrangeInterviewer(QZ_Model_In_InterviewRecords records, int adminID, QZ_Enum_Schedules schedules)
+        {
+            try
+            {
+                records.Schedule = (int)schedules;
+                records.InterviewerAdminIds += $"{adminID}|";
+                base._DbContext.Attach(records);
+                base._DbContext.Entry(records).Property(p => p.InterviewerAdminIds).IsModified = true;
+                base._DbContext.Entry(records).Property(p => p.Schedule).IsModified = true;
+                return base._DbContext.SaveChanges() > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
         #endregion
 
         #region 读取

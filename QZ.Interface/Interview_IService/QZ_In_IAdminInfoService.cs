@@ -21,6 +21,12 @@ namespace QZ.Interface.Interview_IService
         /// <param name="userInfo"></param>
         /// <returns></returns>
         string GetAdminUserToken(QZ_Model_In_AdminInfo adminInfo);
+
+        /// <summary>
+        /// 获取管理员列表
+        /// </summary>
+        /// <returns></returns>
+        List<QZ_Model_In_AdminInfo> GetAdminList();
         #endregion
     }
 }
