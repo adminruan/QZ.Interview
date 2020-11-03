@@ -183,6 +183,12 @@ namespace QZ.Interview.Api
                 }
                 if (_iInterviewRecordsService.ArrangeInterviewer(interviewInfo, InterviewAdminID, QZ_Enum_Schedules.InterviewFirst))
                 {
+                    //通知面试官面试模板
+                    if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+                    {
+                        QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 2));
+                    }
+
                     return base.Write(EnumResponseCode.Success, "分配成功");
                 }
                 return base.Write(EnumResponseCode.Error, "分配失败");
@@ -287,6 +293,14 @@ namespace QZ.Interview.Api
                 }
 
                 //面试通过给面试者、下轮面试官发送微信公众号消息提醒
+                //if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+                //{
+                //    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 2));
+                //}
+                //if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+                //{
+                //    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 3));
+                //}
 
                 _iInterviewRecordsService.Update(interviewInfo);
                 return base.Write(EnumResponseCode.Success);

@@ -35,7 +35,7 @@ namespace QZ.Common
         /// <param name="appSerect">凭证密钥</param>
         /// <param name="accessToken">用户令牌</param>
         /// <returns></returns>
-        public static bool GetAccessToken(string appID, string appSerect, out string accessToken)
+        public static bool GetAccessToken(out string accessToken, string appID = "", string appSerect = "")
         {
             try
             {
@@ -99,14 +99,15 @@ namespace QZ.Common
 
         #region 公众号消息模板
         /// <summary>
-        /// 待处理面试通知模板
+        /// 公众号消息模板
         /// </summary>
         /// <param name="openId">接受消息用户OpenID</param>
         /// <param name="templateId">消息模板ID</param>
         /// <param name="appID">点击模板消息需要跳转的小程序</param>
         /// <param name="pagePath">所需跳转到小程序的具体页面路径，支持带参数,（示例index?foo=bar）</param>
+        /// <param name="type">1：待处理面试通知模板、2：通知面试官面试模板</param>
         /// <returns></returns>
-        public static string AwaitInterviewTemplate(string openId, string templateId = "nuoUIwDpMb1T_MrcU1WkG0UV-HclVR0Jl7lWBdf4-Tg", string appID = "", string pagePath = "")
+        public static string AwaitInterviewTemplate(string openId, string templateId = "nuoUIwDpMb1T_MrcU1WkG0UV-HclVR0Jl7lWBdf4-Tg", string appID = "", string pagePath = "", int type = 1)
         {
             Dictionary<string, dynamic> parameter = new Dictionary<string, dynamic>();
             parameter.Add("touser", openId);
@@ -119,7 +120,18 @@ namespace QZ.Common
                 parameter.Add("miniprogram", miniProgramData);
             }
             parameter.Add("template_id", templateId);//消息模板ID
-            parameter.Add("data", "这里是待发送的数据信息");
+
+            switch (type)
+            {
+                case 2:
+                    //通知面试官面试模板
+                    parameter.Add("data", "这里是待发送的数据信息");
+                    break;
+                default:
+                    //待处理面试通知模板
+                    parameter.Add("data", "这里是待发送的数据信息");
+                    break;
+            }
             return JsonConvert.SerializeObject(parameter);
         }
         #endregion
