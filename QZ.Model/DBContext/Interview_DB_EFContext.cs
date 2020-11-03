@@ -18,6 +18,7 @@ namespace QZ.Model.DBContext
         public virtual DbSet<QZ_Model_In_AdminInfo> AdminInfos { get; set; }
         public virtual DbSet<QZ_Model_In_Menu> Menus { get; set; }
         public virtual DbSet<QZ_Model_In_InterviewRecords> InterviewRecords { get; set; }
+        public virtual DbSet<QZ_Model_In_Positions> Positions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

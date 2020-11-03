@@ -171,7 +171,7 @@ namespace QZ.Interview.Api
                 List<Interview_UserHistoryJob> jobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(basicInfo.Jobs);
                 basicInfo.ExtJobs = jobs;
             }
-            return base.Write(basicInfo, "Educations|Jobs", false);
+            return base.Write(basicInfo, "ID|Educations|Jobs|ExtInterviewID|ExtInterviewDate|ExtSchedule|ExtAdminIds", false);
         }
         #endregion
 

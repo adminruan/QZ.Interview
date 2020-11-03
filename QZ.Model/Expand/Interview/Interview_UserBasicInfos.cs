@@ -10,7 +10,7 @@ namespace QZ.Model.Expand
     /// </summary>
     public class Interview_UserBasicInfo : Interview_BaseAuthority
     {
-        public int ID { get; set; }
+        //public int ID { get; set; }
 
         /// <summary>
         /// 真实姓名
@@ -183,7 +183,7 @@ namespace QZ.Model.Expand
         /// <summary>
         /// 专业
         /// </summary>
-        public string major { get; set; }
+        public string Major { get; set; }
     }
 
     /// <summary>

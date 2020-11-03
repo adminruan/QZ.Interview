@@ -39,38 +39,74 @@ namespace QZ.Service.Interview_Service
         /// <returns></returns>
         public bool SubmitBasicInfo(Interview_UserBasicInfo info, out QZ_Model_In_UserBasicInfo basicInfo)
         {
-            QZ_Model_In_UserBasicInfo model = new QZ_Model_In_UserBasicInfo();
-            model.UserID = info.UserID;
-            model.RealName = info.RealName;
-            model.Gender = info.Gender;
-            model.Nation = info.Nation;
-            model.Education = info.Education;
-            model.IdentityNumber = info.IdentityNumber;
-            model.BirthDate = info.BirthDate;
-            model.Age = info.Age;
-            model.Marriage = info.Marriage;
-            model.NativePlace = info.NativePlace;
-            model.Farmer = info.Farmer;
-            model.Moblie = info.Moblie;
-            model.WechatID = info.WechatID;
-            model.EmergencyContact = info.EmergencyContact;
-            model.EmergencyMobile = info.EmergencyMobile;
-            model.Educations = info.EducationsJson;
-            model.Jobs = info.JobsJson;
-            model.ApplyJob = info.ApplyJob;
-            model.ExpectSalary = info.ExpectSalary;
-            model.LowSalary = info.LowSalary;
-            model.ArriveTime = info.ArriveTime;
-            model.ResumeSource = info.ResumeSource;
-            model.AddTime = DateTime.Now;
-            model.Updatetime = DateTime.Now;
-            if (base.Insert(model).ID > 0)
+            try
             {
+                QZ_Model_In_UserBasicInfo model = base.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == info.UserID);
+                if (model != null)
+                {
+                    //更改
+                    model.RealName = info.RealName;
+                    model.Gender = info.Gender;
+                    model.Nation = info.Nation;
+                    model.Education = info.Education;
+                    model.IdentityNumber = info.IdentityNumber;
+                    model.BirthDate = info.BirthDate;
+                    model.Age = info.Age;
+                    model.Marriage = info.Marriage;
+                    model.NativePlace = info.NativePlace;
+                    model.Farmer = info.Farmer;
+                    model.Moblie = info.Moblie;
+                    model.WechatID = info.WechatID;
+                    model.EmergencyContact = info.EmergencyContact;
+                    model.EmergencyMobile = info.EmergencyMobile;
+                    model.Educations = info.EducationsJson;
+                    model.Jobs = info.JobsJson;
+                    model.ApplyJob = info.ApplyJob;
+                    model.ExpectSalary = info.ExpectSalary;
+                    model.LowSalary = info.LowSalary;
+                    model.ArriveTime = info.ArriveTime;
+                    model.ResumeSource = info.ResumeSource;
+                    model.Updatetime = DateTime.Now;
+                    base.Update(model);
+                }
+                else
+                {
+                    //新增
+                    model = new QZ_Model_In_UserBasicInfo();
+                    model.UserID = info.UserID;
+                    model.RealName = info.RealName;
+                    model.Gender = info.Gender;
+                    model.Nation = info.Nation;
+                    model.Education = info.Education;
+                    model.IdentityNumber = info.IdentityNumber;
+                    model.BirthDate = info.BirthDate;
+                    model.Age = info.Age;
+                    model.Marriage = info.Marriage;
+                    model.NativePlace = info.NativePlace;
+                    model.Farmer = info.Farmer;
+                    model.Moblie = info.Moblie;
+                    model.WechatID = info.WechatID;
+                    model.EmergencyContact = info.EmergencyContact;
+                    model.EmergencyMobile = info.EmergencyMobile;
+                    model.Educations = info.EducationsJson;
+                    model.Jobs = info.JobsJson;
+                    model.ApplyJob = info.ApplyJob;
+                    model.ExpectSalary = info.ExpectSalary;
+                    model.LowSalary = info.LowSalary;
+                    model.ArriveTime = info.ArriveTime;
+                    model.ResumeSource = info.ResumeSource;
+                    model.AddTime = DateTime.Now;
+                    model.Updatetime = DateTime.Now;
+                    base.Insert(model);
+                }
                 basicInfo = model;
                 return true;
             }
-            basicInfo = null;
-            return false;
+            catch (Exception)
+            {
+                basicInfo = null;
+                return false;
+            }
         }
         #endregion
     }

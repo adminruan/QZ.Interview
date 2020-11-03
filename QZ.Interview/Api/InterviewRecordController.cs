@@ -22,18 +22,20 @@ namespace QZ.Interview.Api
     public class InterviewRecordController : InterviewControllerBase
     {
 
-        public InterviewRecordController(QZ_In_IAdminInfoService iAdminInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService) : base(iAdminInfoService)
+        public InterviewRecordController(QZ_In_IAdminInfoService iAdminInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService, QZ_In_IPositionsService iPositionsService) : base(iAdminInfoService)
         {
             this._iAdminInfoService = iAdminInfoService;
             this._iInterviewRecordsService = iInterviewRecordsService;
+            this._iPositionsService = iPositionsService;
         }
         private readonly static object _obj = new object();
         private readonly QZ_In_IInterviewRecordsService _iInterviewRecordsService;
         private readonly QZ_In_IAdminInfoService _iAdminInfoService;
+        private readonly QZ_In_IPositionsService _iPositionsService;
 
-        #region 待处理面试信息
+        #region 获取面试信息列表
         /// <summary>
-        /// 待处理面试信息
+        /// 获取面试信息列表
         /// </summary>
         /// <param name="AdminID">管理员ID</param>
         /// <param name="AdminToken">管理员令牌</param>
@@ -99,20 +101,26 @@ namespace QZ.Interview.Api
             pairs.Add("limit", "20");
             pairs.Add("totalPages", totalPage.ToString());
 
-            return base.Write(list, data: pairs);
+            return base.Write(list, appoints: "RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
         }
         #endregion
 
         #region 获取职位
         public JsonResult GetPositions()
         {
-            var pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Positions));
-            Dictionary<string, string> newPairs = new Dictionary<string, string>();
-            foreach (var item in pairs)
+            List<QZ_Model_In_Positions> positions = _iPositionsService.GetPositions();
+            if (positions == null || positions.Count == 0)
             {
-                newPairs.Add(item.Key, item.Value.ToString());
+                return base.Write(EnumResponseCode.Error, "暂无职位信息");
             }
-            return base.Write(EnumResponseCode.Success, data: newPairs);
+            return base.Write<QZ_Model_In_Positions>(positions, appoints: "ID|PositionName");
+            //var pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Positions));
+            //Dictionary<string, string> newPairs = new Dictionary<string, string>();
+            //foreach (var item in pairs)
+            //{
+            //    newPairs.Add(item.Value.ToString(), item.Key);
+            //}
+            //return base.Write(EnumResponseCode.Success, data: newPairs);
         }
         #endregion
 
@@ -191,7 +199,7 @@ namespace QZ.Interview.Api
         /// <param name="InterviewID">面试记录ID</param>
         /// <param name="Remark">面试评语</param>
         /// <param name="InterviewAdminID">下轮面试管理员ID</param>
-        /// <param name="Status">本轮面试结果(1：面试终止、2：转入人才库备用、3：本轮面试通过)</param>
+        /// <param name="Status">本轮面试结果（301：不合适、302：备用、303：合适）</param>
         /// <returns></returns>
         public JsonResult InterviewerRemark(int AdminID, string AdminToken, int InterviewID, string Remark, int InterviewAdminID, int Status)
         {
@@ -214,17 +222,17 @@ namespace QZ.Interview.Api
                 {
                     return base.Write(EnumResponseCode.Error, "请先分配面试");
                 }
-                if (interviewInfo.Schedule >= (int)QZ_Enum_Schedules.Fail)
+                if (interviewInfo.Schedule >= (int)QZ_Enum_Schedules.PendingApproval)
                 {
                     return base.Write(EnumResponseCode.Error, "面试已结束");
                 }
                 switch (Status)
                 {
-                    case 1:
+                    case 301:
                         //不合适
                         interviewInfo.Schedule = (int)QZ_Enum_Schedules.Fail;
                         break;
-                    case 2:
+                    case 302:
                         //备用
                         interviewInfo.Schedule = (int)QZ_Enum_Schedules.Spare;
                         break;
@@ -237,6 +245,11 @@ namespace QZ.Interview.Api
                                     {
                                         //二面通过，进入总经理审批入职
                                         interviewInfo.Schedule = (int)QZ_Enum_Schedules.PendingApproval;
+                                        if (InterviewAdminID < 1)
+                                        {
+                                            return base.Write(EnumResponseCode.Error, "请选择最终审批人");
+                                        }
+                                        interviewInfo.InterviewerAdminIds += $"{InterviewAdminID}|";
                                     }
                                     break;
                                 default:

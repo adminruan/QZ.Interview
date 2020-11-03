@@ -152,21 +152,21 @@ namespace QZ.Interview.Api.Bases
                 if (!string.IsNullOrWhiteSpace(appoints))
                 {
                     //指定字段响应或隐藏
-                    //List<string> appointList = appointList = appoints.Split("|", StringSplitOptions.RemoveEmptyEntries).ToList();
+                    List<string> appointList = appointList = appoints.Split("|", StringSplitOptions.RemoveEmptyEntries).ToList();
                     if (appointRes)
                     {
-                        properties = properties.Where(p => appoints.Contains(p.Name)).ToArray();
+                        properties = properties.Where(p => appointList.Contains(p.Name)).ToArray();
                     }
                     else
                     {
-                        properties = properties.Where(p => !appoints.Contains(p.Name)).ToArray();
+                        properties = properties.Where(p => !appointList.Contains(p.Name)).ToArray();
                     }
                 }
                 Dictionary<string, string> valuePairs = new Dictionary<string, string>();
                 foreach (var property in properties)
                 {
-                    var keyValue = PropertyDispose(property, properties);
-                    if (!keyValue.Equals(default))
+                    KeyValuePair<string, string> keyValue = PropertyDispose(property, item);
+                    if (!keyValue.Equals(default(KeyValuePair<string, string>)))
                     {
                         valuePairs.Add(keyValue.Key, keyValue.Value);
                     }
@@ -240,7 +240,11 @@ namespace QZ.Interview.Api.Bases
                     string nameO = name.Substring(1, name.Length - 1);
                     name = nameF + nameO;
                 }
-                if (item.PropertyType.Name == "Boolean")
+                if (item.GetValue(t) == null)
+                {
+                    pairs.Add(name, "");
+                }
+                else if (item.PropertyType.Name == "Boolean")
                 {
                     pairs.Add(name, QZ_Helper_Encryption.Base64Encode(item.GetValue(t).ToString().ToLower()));
                 }
@@ -272,7 +276,7 @@ namespace QZ.Interview.Api.Bases
         /// <param name="t">属性来源</param>
         /// <param name="dateType">时间类型</param>
         /// <returns></returns>
-        private KeyValuePair<string, string> PropertyDispose<T>(PropertyInfo property, T t)
+        private KeyValuePair<string, string> PropertyDispose<T>(PropertyInfo property, T t) where T : class
         {
             KeyValuePair<string, string> pair = default(KeyValuePair<string, string>);
             try
@@ -289,8 +293,12 @@ namespace QZ.Interview.Api.Bases
                     string nameO = name.Substring(1, name.Length - 1);
                     name = nameF + nameO;
                 }
+                if (string.IsNullOrWhiteSpace(property.GetValue(t).ToString()))
+                {
+                    pair = new KeyValuePair<string, string>(name, "");
+                }
                 //处理bool类型转换为字符串时大写问题
-                if (property.PropertyType.Name == "Boolean")
+                else if (property.PropertyType.Name == "Boolean")
                 {
                     pair = new KeyValuePair<string, string>(name, QZ_Helper_Encryption.Base64Encode(property.GetValue(t).ToString().ToLower()));
                 }
