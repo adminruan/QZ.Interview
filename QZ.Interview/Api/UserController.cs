@@ -217,7 +217,7 @@ namespace QZ.Interview.Api
                 return base.Write(EnumResponseCode.Error, "面试申请提交失败");
             }
             //给人事发送微信公众号消息通知
-            if (QZ_Helper_Wechat.GetAccessToken(_APPID, _APPSECRET, out string accessToken))
+            if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
             {
                 foreach (var item in admins)
                 {

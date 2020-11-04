@@ -101,7 +101,7 @@ namespace QZ.Interview.Api
             pairs.Add("limit", "20");
             pairs.Add("totalPages", totalPage.ToString());
 
-            return base.Write(list, appoints: "RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
+            return base.Writes(list, appoints: "RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
         }
         #endregion
 
@@ -113,7 +113,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "暂无职位信息");
             }
-            return base.Write<QZ_Model_In_Positions>(positions, appoints: "ID|PositionName");
+            return base.Writes<QZ_Model_In_Positions>(positions, appoints: "ID|PositionName");
             //var pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Positions));
             //Dictionary<string, string> newPairs = new Dictionary<string, string>();
             //foreach (var item in pairs)
@@ -121,6 +121,14 @@ namespace QZ.Interview.Api
             //    newPairs.Add(item.Value.ToString(), item.Key);
             //}
             //return base.Write(EnumResponseCode.Success, data: newPairs);
+        }
+        #endregion
+
+        #region 简历来源平台
+        public JsonResult RecruitPlatforms()
+        {
+            Dictionary<string, int> pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_RecruitPlatform));
+            return base.Writes(pairs.Select(p => new { value = p.Value, name = p.Key }).ToList());
         }
         #endregion
 
@@ -142,7 +150,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "暂无数据");
             }
-            return base.Write<QZ_Model_In_AdminInfo>(admins, appoints: "AdminID|RealName|Position");
+            return base.Writes<QZ_Model_In_AdminInfo>(admins, appoints: "AdminID|RealName|Position");
         }
         #endregion
 

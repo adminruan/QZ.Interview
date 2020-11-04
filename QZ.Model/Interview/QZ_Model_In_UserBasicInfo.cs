@@ -182,10 +182,52 @@ namespace QZ.Model.Interview
         public int ExtSchedule { get; set; }
 
         /// <summary>
+        ///  面试进度（状态）
+        /// </summary>
+        [NotMapped]
+        public string ExtScheduleText { get; set; }
+
+        /// <summary>
         /// 负责操作的管理员ID
         /// </summary>
         [NotMapped]
         public string ExtAdminIds { get; set; }
+
+        /// <summary>
+        /// 面试评语
+        /// </summary>
+        [NotMapped]
+        public string ExtRemarks { get; set; }
+
+        /// <summary>
+        /// 简历来源平台
+        /// </summary>
+        [NotMapped]
+        public string ExtResumeSource { get; set; }
+
+        /// <summary>
+        /// 预计到岗日期
+        /// </summary>
+        [NotMapped]
+        public DateTime? ExtArriveTime { get; set; }
+
+        /// <summary>
+        /// 申请的岗位
+        /// </summary>
+        [NotMapped]
+        public string ExtApplyJob { get; set; }
+
+        /// <summary>
+        /// 一面时间
+        /// </summary>
+        [NotMapped]
+        public DateTime? ExtFirstDate { get; set; }
+
+        /// <summary>
+        /// 二面时间
+        /// </summary>
+        [NotMapped]
+        public DateTime? ExtSecondDate { get; set; }
         #endregion
     }
 }

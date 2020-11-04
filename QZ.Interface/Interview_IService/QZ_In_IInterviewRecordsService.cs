@@ -17,7 +17,7 @@ namespace QZ.Interface.Interview_IService
         /// <param name="adminID">负责处理管理员ID</param>
         /// <returns></returns>
         bool SubmitInterviewRecord(int uid, int adminID);
-        
+
         /// <summary>
         /// 更新下轮面试人
         /// </summary>
@@ -46,6 +46,13 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <returns></returns>
         IQueryable<QZ_Model_In_UserBasicInfo> GetDataInterview();
+
+        /// <summary>
+        /// 获取面试信息
+        /// 后台管理使用
+        /// </summary>
+        /// <returns></returns>
+        IQueryable<QZ_Model_In_UserBasicInfo> GetData();
         #endregion
     }
 }

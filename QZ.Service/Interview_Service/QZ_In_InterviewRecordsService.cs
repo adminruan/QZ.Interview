@@ -142,6 +142,33 @@ namespace QZ.Service.Interview_Service
                         ExtAdminIds = i.InterviewerAdminIds
                     }).OrderByDescending(p => p.ExtInterviewDate);
         }
+
+
+        /// <summary>
+        /// 获取面试信息
+        /// 后台管理使用
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<QZ_Model_In_UserBasicInfo> GetData()
+        {
+            return (from i in _InterviewRecords
+                    join u in _Users on i.UserID equals u.UserID
+                    join b in _UserBasicInfos on u.UserID equals b.UserID
+                    select new QZ_Model_In_UserBasicInfo
+                    {
+                        RealName = b.RealName,
+                        Gender = b.Gender,
+                        Age = b.Age,
+                        Moblie = b.Moblie,
+                        ApplyJob = b.ApplyJob,
+                        ExtSchedule = i.Schedule,
+                        ResumeSource = b.ResumeSource,
+                        ExtInterviewDate = i.AddTime,
+                        ExtRemarks = i.Remarks,
+                        ExtArriveTime = b.ArriveTime,
+                        UserID = b.UserID
+                    }).OrderByDescending(p => p.ExtInterviewDate);
+        }
         #endregion
     }
 }

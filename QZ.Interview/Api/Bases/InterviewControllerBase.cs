@@ -129,7 +129,7 @@ namespace QZ.Interview.Api.Bases
         /// <param name="dateFomart">时间格式</param>
         /// <param name="data">附带的data数据</param>
         /// <returns></returns>
-        protected JsonResult Write<T>(List<T> list, string appoints = "", bool appointRes = true, string message = "", string dateFomart = "", Dictionary<string, string> data = null) where T : class
+        protected JsonResult Writes<T>(List<T> list, string appoints = "", bool appointRes = true, string message = "", string dateFomart = "", Dictionary<string, string> data = null) where T : class
         {
             if (!string.IsNullOrWhiteSpace(dateFomart))
             {
