@@ -16,11 +16,13 @@ namespace QZ.Service.Interview_Service
         private readonly DbSet<QZ_Model_In_InterviewRecords> _InterviewRecords;
         private readonly DbSet<QZ_Model_In_User> _Users;
         private readonly DbSet<QZ_Model_In_UserBasicInfo> _UserBasicInfos;
+        private readonly DbSet<QZ_Model_In_Positions> _Positions;
         public QZ_In_InterviewRecordsService(Interview_DB_EFContext dbContext) : base(dbContext)
         {
             this._InterviewRecords = dbContext.InterviewRecords;
             this._Users = dbContext.Users;
             this._UserBasicInfos = dbContext.UserBasicInfos;
+            this._Positions = dbContext.Positions;
         }
 
         #region 写入
@@ -166,8 +168,51 @@ namespace QZ.Service.Interview_Service
                         ExtInterviewDate = i.AddTime,
                         ExtRemarks = i.Remarks,
                         ExtArriveTime = b.ArriveTime,
-                        UserID = b.UserID
+                        UserID = b.UserID,
+                        IdentityNumber = b.IdentityNumber
                     }).OrderByDescending(p => p.ExtInterviewDate);
+        }
+
+        /// <summary>
+        /// 通过用户ID获取用户面试信息
+        /// </summary>
+        /// <param name="uid">用户ID</param>
+        /// <returns></returns>
+        public QZ_Model_In_UserBasicInfo GetInterviewInfoByUID(int uid)
+        {
+            return (from i in _InterviewRecords
+                    join b in _UserBasicInfos on i.UserID equals b.UserID
+                    join p in _Positions on b.ApplyJob equals p.ID into p2
+                    from p in p2.DefaultIfEmpty()
+                    where i.UserID == uid
+                    select new QZ_Model_In_UserBasicInfo
+                    {
+                        RealName = b.RealName,
+                        Gender = b.Gender,
+                        Age = b.Age,
+                        Marriage = b.Marriage,
+                        Nation = b.Nation,
+                        BirthDate = b.BirthDate,
+                        Education = b.Education,
+                        Farmer = b.Farmer,
+                        NativePlace = b.NativePlace,
+                        IdentityNumber = b.IdentityNumber,
+                        ExtApplyJob = p.PositionName,
+                        ResumeSource = b.ResumeSource,
+                        Moblie = b.Moblie,
+                        WechatID = b.WechatID,
+                        ExtSchedule = i.Schedule,
+                        EmergencyContact = b.EmergencyContact,
+                        EmergencyMobile = b.EmergencyMobile,
+                        Educations = b.Educations,
+                        Jobs = b.Jobs,
+                        ArriveTime = b.ArriveTime,
+                        ExpectSalary = b.ExpectSalary,
+                        LowSalary = b.LowSalary,
+                        ExtRemarks = i.Remarks,
+                        UserID = b.UserID,
+                        ExtInterviewDate = i.AddTime
+                    }).FirstOrDefault();
         }
         #endregion
     }

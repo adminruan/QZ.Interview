@@ -53,6 +53,13 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <returns></returns>
         IQueryable<QZ_Model_In_UserBasicInfo> GetData();
+
+        /// <summary>
+        /// 通过用户ID获取用户面试信息
+        /// </summary>
+        /// <param name="uid">用户ID</param>
+        /// <returns></returns>
+        QZ_Model_In_UserBasicInfo GetInterviewInfoByUID(int uid);
         #endregion
     }
 }

@@ -1,0 +1,260 @@
+﻿@using QZ.Model.Interview
+@using QZ.Model.Expand
+@model QZ_Model_In_UserBasicInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>个人信息</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <style>
+        body {
+            background-color: #eee;
+        }
+
+        .layui-fluid {
+            padding-top: 10px;
+        }
+
+        .not-data {
+            width: 100%;
+            height: 60px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        基本信息
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>姓名：</label>@Model.RealName
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>性别：</label>@(Model.Gender == "1" ? "男" : "女")
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>年龄：</label>@Model.Age
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>婚否：</label>@(Model.Marriage ? "已婚" : "未婚")
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>民族：</label>@Model.Nation
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>出生年月：</label>@Model.BirthDate.ToString("yyyy-MM-dd")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>学历：</label>@Model.Education
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>户籍性质：</label>@(Model.Farmer ? "务农" : "非农")
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>籍贯：</label>@Model.NativePlace
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>身份证号：</label>@(Model?.IdentityNumber ?? "--")
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>简历来源：</label>@Model.ExtResumeSource
+                            </div>
+                        </div>
+                        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                            <legend>更多</legend>
+                        </fieldset>
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>联系方式：</label>@Model.Moblie
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>微信号：</label>@Model.WechatID
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>紧急联系人：</label>@Model.EmergencyContact
+                            </div>
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>相互关系：</label>@Model.EmergencyContact
+                            </div>
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>联系方式：</label>@Model.EmergencyMobile
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        岗位信息
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>岗位：</label>@Model.ExtApplyJob
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>提交时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd")
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>预计到岗时间：</label>@Model.ArriveTime.ToString("yyyy-MM-dd")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-col-xs12 layui-col-md4">
+                                <label>期望薪资：</label>@(Model.ExpectSalary.ToString("0.00￥"))
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4">
+                                <label>可接受薪资：</label>@(Model.LowSalary.ToString("0.00￥"))
+                            </div>
+                            <div class="layui-col-xs6 layui-col-md4" style="height:50px;">
+                                <label>面试进度：</label>@*@Model.ExtScheduleText*@
+                                <select id="Schedules" name="Schedules" class="layui-unselect layui-form-select">
+                                    @foreach (var item in ViewBag.Schedules as Dictionary<string, int>)
+                                    {
+                                        @if (Model.ExtSchedule == item.Value)
+                                        {
+                                            <option value="@item.Value" selected>@item.Key</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Value">@item.Key</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        教育培训/工作经历
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-card-body">
+                            <fieldset class="layui-elem-field site-demo-button">
+                                <legend>教育培训</legend>
+                                @if (Model.ExtEducations != null && Model.ExtEducations.Count > 0)
+                                {
+                                    @foreach (var item in Model.ExtEducations as List<Interview_UserEducation>)
+                                    {
+                                        <div><p>@item.AdmissionTime - @item.GraduationTime</p></div>
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs12 layui-col-md4">
+                                                <label>学校/机构：</label>@item.School
+                                            </div>
+                                            <div class="layui-col-xs6 layui-col-md4">
+                                                <label>教育类型：</label>@item.Type
+                                            </div>
+                                            <div class="layui-col-xs6 layui-col-md4">
+                                                <label>专业：</label>@item.Major
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="not-data">暂无教育经历</div>
+                                }
+                            </fieldset>
+                            <fieldset class="layui-elem-field site-demo-button" style="margin-top: 10px;">
+                                <legend>工作经历</legend>
+                                @if (Model.ExtJobs != null && Model.ExtJobs.Count > 0)
+                                {
+                                    @foreach (var item in Model.ExtJobs as List<Interview_UserHistoryJob>)
+                                    {
+                                        <div><p>@item.StartTime - @item.EndTime</p></div>
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs12 layui-col-md4">
+                                                <label>公司名称：</label>@item.Company
+                                            </div>
+                                            <div class="layui-col-xs6 layui-col-md4">
+                                                <label>职务/岗位：</label>@item.Duty
+                                            </div>
+                                            <div class="layui-col-xs6 layui-col-md4">
+                                                <label>薪资：</label>@item.Salary.ToString("0.00￥")
+                                            </div>
+                                        </div>
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs12 layui-col-md4">
+                                                <label>离职原因：</label>@item.Remark
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="not-data">暂无工作经历</div>
+                                }
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+                            <ul class="layui-tab-title">
+                                <li class="layui-this">面试信息</li>
+                                <li>历史记录</li>
+                            </ul>
+                            <div class="layui-tab-content">
+                                <div class="layui-tab-item layui-show">
+                                    <div class="layui-row">
+                                        <div class="layui-col-xs12 layui-col-md4">
+                                            <label>信息填报时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                        </div>
+                                        <div class="layui-col-xs6 layui-col-md4">
+                                            <label>提交时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd")
+                                        </div>
+                                        <div class="layui-col-xs6 layui-col-md4">
+                                            <label>预计到岗时间：</label>@Model.ArriveTime.ToString("yyyy-MM-dd")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-tab-item">
+                                    <div id="laydateDemo"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

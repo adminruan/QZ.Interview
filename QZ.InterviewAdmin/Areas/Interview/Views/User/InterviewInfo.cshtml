@@ -1,0 +1,164 @@
+﻿@using QZ.Model.Interview
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>面试信息</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/layuiadmin/layui/layui.js"></script>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        面试信息
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="MobileOrIDNumber" id="MobileOrIDNumber" placeholder="请输入姓名/手机号/身份证" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ApplyDate" id="ApplyDate" placeholder="请输入填报时间" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-form">
+                                    <select id="Scheduls" name="Scheduls">
+                                        <option value="" selected>请选择进度</option>
+                                        @foreach (var item in ViewBag.Schedules as Dictionary<string, int>)
+                                        {
+                                            <option value="@item.Value">@item.Key</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-form">
+                                    <select id="Positions" name="Positions">
+                                        <option value="" selected> 请选择岗位</option>
+                                        @foreach (var item in ViewBag.Positions as List<QZ_Model_In_Positions>)
+                                        {
+                                            <option value="@item.ID">@item.PositionName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="layui-btn layui-btn-md layui-bg-green" data-method="search"><i class="layui-icon">&#xe615;</i> 搜索</button>
+                        </div>
+                        <div class="layui-row">
+                            <table id="tab-interviews" lay-filter="lay-interviews"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*头部工具栏*@
+    <script type="text/html" id="toolbar">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i> 添加</button>
+        </div>
+    </script>
+    @*行内工具栏*@
+    <script type="text/html" id="linebar">
+        <a class="layui-btn layui-btn-sm" lay-event="event-edit" style="line-height:28px">编辑</a>
+    </script>
+    <script type="text/javascript">
+        var active;
+        layui.use(['layer', 'table', 'form', 'laydate'], function () {
+            var form = layui.form
+                , laydate = layui.laydate
+                , $ = layui.jquery
+                , layer = layui.layer
+                , table = layui.table;
+            laydate.render({
+                elem: '#ApplyDate'
+            });
+            //事件定义
+            active = {
+                setTable: function () {
+                    table.render({
+                        elem: '#tab-interviews'
+                        , id: 'tab-interviews'
+                        , url: '/Interview/User/GetInterviewInfo' //数据接口
+                        , title: '面试信息'
+                        , page: true //开启分页
+                        , limit: 20
+                        , limits: [20, 50, 100]
+                        , where: { 'mobileOrIDNumber': $('#MobileOrIDNumber').val(), 'shedules': $('#Scheduls').val(), 'position': $('#Positions').val(), 'date': $('#ApplyDate').val() }
+                        , toolbar: '#toolbar'
+                        , cols: [[ //表头
+                            { field: 'RealName', title: '姓名', align: 'center' }
+                            , {
+                                field: 'Gender', title: '性别', align: 'center', templet: function (d) {
+                                    if (d.Gender == 1) {
+                                        return "男";
+                                    } else {
+                                        return "女";
+                                    }
+                                }
+                            }
+                            , { field: 'Age', title: '年龄', align: 'center' }
+                            , { field: 'Moblie', title: '联系方式', align: 'center' }
+                            , { field: 'ExtApplyJob', title: '岗位', align: 'center' }
+                            , { field: 'ExtScheduleText', title: '进度', align: 'center' }
+                            , { field: 'ExtResumeSource', title: '简历来源平台', align: 'center' }
+                            , { field: 'ExtInterviewDate', title: '填报时间', align: 'center', width: '10%', sort: true }
+                            , { field: 'ExtFirstDate', title: '一轮面试时间', align: 'center', width: '10%', sort: true, templet: function (d) { return (d.ExtFirstDate == '' || d.ExtFirstDate == ' ' || d.ExtFirstDate == null) ? '--' : d.ExtFirstDate; } }
+                            , { field: 'ExtSecondDate', title: '二轮面试时间', align: 'center', width: '10%', sort: true, templet: function (d) { return (d.ExtSecondDate == '' || d.ExtSecondDate == ' ' || d.ExtSecondDate == null) ? '--' : d.ExtSecondDate; } }
+                            , { field: 'ExtArriveTime', title: '预计到岗时间', align: 'center', width: '10%', sort: true }
+                            , { fixed: '', title: '操作', align: 'center', width: '10%', toolbar: '#linebar' }
+                        ]]
+                    });
+                },
+                search: function () {
+                    var that = this;
+                    active.setTable();
+                },
+                openedit: function (id) {
+                    layer.open({
+                        type: 2,
+                        closeBtn: 2,
+                        title: '个人信息',
+                        area: ['1100px', '800px'],
+                        content: '../User/InterviewEdit?uid=' + id,
+                        end: function () {
+                        }
+                    });
+                }
+            };
+            //初始化
+            active.setTable();
+            //事件监听
+            $('.layui-fluid .layui-card-body .layui-btn').on('click', function () {
+                var that = this;
+                var method = $(that).data('method');
+                active[method] && active[method].call(that);
+            });
+            //行内工具拦监听
+            table.on('tool(lay-interviews)', function (obj) {
+                var d = obj.data;
+                var e = obj.event;
+                var that = this;
+                switch (e) {
+                    case 'event-edit':
+                    default:
+                        active.openedit(d.UserID);
+                        return;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

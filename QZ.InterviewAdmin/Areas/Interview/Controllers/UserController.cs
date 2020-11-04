@@ -10,6 +10,7 @@ using QZ.Common.Enums;
 using QZ.Common.Expand;
 using QZ.Interface.Interview_IService;
 using QZ.InterviewAdmin.Controllers;
+using QZ.Model.Expand;
 using QZ.Model.Expand.Interview;
 using QZ.Model.Interview;
 
@@ -26,6 +27,7 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
         private readonly QZ_In_IInterviewRecordsService _iInterviewRecordsService;
         private readonly QZ_In_IUserBasicInfoService _iUserBasicInfoService;
         private readonly QZ_In_IPositionsService _iPositionsService;
+
         #region 面试信息
         /// <summary>
         /// 面试信息视图
@@ -34,6 +36,9 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
         [Area("Interview")]
         public IActionResult InterviewInfo()
         {
+            Dictionary<string, int> pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Schedules));
+            ViewBag.Schedules = pairs;
+            ViewBag.Positions = _iPositionsService.GetPositions();
             return View();
         }
 
@@ -48,7 +53,7 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
             Expression<Func<QZ_Model_In_UserBasicInfo, bool>> where = p => true;
             if (!string.IsNullOrWhiteSpace(mobileOrIDNumber))
             {
-                where = where.And(p => p.Moblie == mobileOrIDNumber || p.IdentityNumber == mobileOrIDNumber);
+                where = where.And(p => p.Moblie.Contains(mobileOrIDNumber) || p.IdentityNumber.Contains(mobileOrIDNumber) || p.RealName.Contains(mobileOrIDNumber));
             }
             if (date > DateTime.MinValue)
             {
@@ -90,6 +95,43 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
                 }
             });
             return ContentResult(new { code = 0, msg = "", data = list, count = data.Count() });
+        }
+        #endregion
+
+        #region 面试信息编辑
+        /// <summary>
+        /// 面试信息编辑
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        [Area("Interview")]
+        public IActionResult InterviewEdit(int uid)
+        {
+            QZ_Model_In_UserBasicInfo data = new QZ_Model_In_UserBasicInfo();
+            if (uid > 0)
+            {
+                data = _iInterviewRecordsService.GetInterviewInfoByUID(uid);
+            }
+            if (data != null)
+            {
+                data.ExtResumeSource = ((QZ_Enum_RecruitPlatform)data.ResumeSource).GetEnumDescription();
+                if (!string.IsNullOrWhiteSpace(data.Educations))
+                    data.ExtEducations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(data.Educations);
+                else
+                    data.ExtEducations = new List<Interview_UserEducation>();
+                if (!string.IsNullOrWhiteSpace(data.Jobs))
+                    data.ExtJobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(data.Jobs);
+                else
+                    data.ExtJobs = new List<Interview_UserHistoryJob>();
+            }
+            else
+            {
+                data = new QZ_Model_In_UserBasicInfo();
+                data.ExtEducations = new List<Interview_UserEducation>();
+                data.ExtJobs = new List<Interview_UserHistoryJob>();
+            }
+            ViewBag.Schedules = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Schedules));
+            return View(data);
         }
         #endregion
     }
