@@ -79,6 +79,7 @@ namespace QZ.Interview
             {
                 endpoints.MapControllers();
             });
+            app.UseStatusCodePages();
         }
 
         /// <summary>  

@@ -60,5 +60,10 @@ namespace QZ.Model.Interview
         /// 入职时间
         /// </summary>
         public DateTime? EntryTime { get; set; }
+
+        /// <summary>
+        /// 应聘岗位
+        /// </summary>
+        public int ApplyJob { get; set; }
     }
 }

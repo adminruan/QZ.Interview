@@ -105,30 +105,68 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
         /// <param name="uid"></param>
         /// <returns></returns>
         [Area("Interview")]
-        public IActionResult InterviewEdit(int uid)
+        public IActionResult InterviewEdit(int id)
         {
             QZ_Model_In_UserBasicInfo data = new QZ_Model_In_UserBasicInfo();
-            if (uid > 0)
+            if (id > 0)
             {
-                data = _iInterviewRecordsService.GetInterviewInfoByUID(uid);
+                data = _iInterviewRecordsService.GetInterviewInfoByInterviewID(id);
             }
             if (data != null)
             {
                 data.ExtResumeSource = ((QZ_Enum_RecruitPlatform)data.ResumeSource).GetEnumDescription();
+                //教育经历
                 if (!string.IsNullOrWhiteSpace(data.Educations))
+                {
                     data.ExtEducations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(data.Educations);
+                }
                 else
+                {
                     data.ExtEducations = new List<Interview_UserEducation>();
+                }
+                //工作经历
                 if (!string.IsNullOrWhiteSpace(data.Jobs))
+                {
                     data.ExtJobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(data.Jobs);
+                }
                 else
+                {
                     data.ExtJobs = new List<Interview_UserHistoryJob>();
+                }
+                //面试评语
+                if (!string.IsNullOrWhiteSpace(data.ExtRemarks))
+                {
+                    data.ExtRemarkList = JsonConvert.DeserializeObject<List<Interview_InterviewerRemark>>(data.ExtRemarks);
+                }
+                else
+                {
+                    data.ExtRemarkList = new List<Interview_InterviewerRemark>();
+                }
+                //历史面试记录
+                if (data.ExtInterviewID > 0)
+                {
+                    //历史记录
+                    List<QZ_Model_In_UserBasicInfo> historys = _iInterviewRecordsService.GetHistoryInterviews(data.ExtInterviewID, data.UserID);
+                    //岗位信息
+                    List<QZ_Model_In_Positions> positions = _iPositionsService.GetPositions();
+                    if (historys != null && historys.Count > 0)
+                    {
+                        foreach (var item in historys)
+                        {
+                            item.ExtRemarkList = JsonConvert.DeserializeObject<List<Interview_InterviewerRemark>>(item.ExtRemarks);
+                            item.ExtApplyJob = positions.FirstOrDefault(p => p.ID == item.ApplyJob)?.PositionName ?? "未知";
+                            item.ExtScheduleText = ((QZ_Enum_Schedules)item.ExtSchedule).GetEnumDescription();
+                        }
+                    }
+                    data.ExtHistoryInterviews = historys;
+                }
             }
             else
             {
                 data = new QZ_Model_In_UserBasicInfo();
                 data.ExtEducations = new List<Interview_UserEducation>();
                 data.ExtJobs = new List<Interview_UserHistoryJob>();
+                data.ExtRemarkList = new List<Interview_InterviewerRemark>();
             }
             ViewBag.Schedules = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_Schedules));
             return View(data);

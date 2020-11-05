@@ -132,7 +132,7 @@
                         closeBtn: 2,
                         title: '个人信息',
                         area: ['1100px', '800px'],
-                        content: '../User/InterviewEdit?uid=' + id,
+                        content: '../User/InterviewEdit?id=' + id,
                         end: function () {
                         }
                     });
@@ -154,7 +154,7 @@
                 switch (e) {
                     case 'event-edit':
                     default:
-                        active.openedit(d.UserID);
+                        active.openedit(d.ExtInterviewID);
                         return;
                 }
             });

@@ -55,11 +55,19 @@ namespace QZ.Interface.Interview_IService
         IQueryable<QZ_Model_In_UserBasicInfo> GetData();
 
         /// <summary>
-        /// 通过用户ID获取用户面试信息
+        /// 通过面试记录ID获取用户面试信息
         /// </summary>
+        /// <param name="id">面试记录ID</param>
+        /// <returns></returns>
+        QZ_Model_In_UserBasicInfo GetInterviewInfoByInterviewID(int id);
+
+        /// <summary>
+        /// 获取用户除此面试记录以外的历史面试记录
+        /// </summary>
+        /// <param name="interviewID">本次面试记录ID</param>
         /// <param name="uid">用户ID</param>
         /// <returns></returns>
-        QZ_Model_In_UserBasicInfo GetInterviewInfoByUID(int uid);
+        List<QZ_Model_In_UserBasicInfo> GetHistoryInterviews(int interviewID, int uid);
         #endregion
     }
 }

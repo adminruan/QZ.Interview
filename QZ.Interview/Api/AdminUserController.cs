@@ -34,33 +34,41 @@ namespace QZ.Interview.Api
         /// <returns></returns>
         public JsonResult SignIn(string UserName, string Password)
         {
-            if (string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password))
+            try
             {
-                return base.Write(EnumResponseCode.Error, "用户名或密码有误");
+                if (string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password))
+                {
+                    return base.Write(EnumResponseCode.Error, "用户名或密码有误");
+                }
+                QZ_Model_In_AdminInfo adminInfo = _iAdminInfoService.GetUserByUserNameOrMobile(UserName);
+                if (adminInfo == null)
+                {
+                    return base.Write(EnumResponseCode.Error, "用户名或密码有误");
+                }
+                if (adminInfo.Status != 0)
+                {
+                    return base.Write(EnumResponseCode.Error, "账号异常，请联系管理员");
+                }
+                if (adminInfo.Password.ToLower() != QZ_Helper_Encryption.Get32MD5String(Password).ToLower())
+                {
+                    return base.Write(EnumResponseCode.Error, "用户名或密码有误");
+                }
+                Dictionary<string, string> pairs = new Dictionary<string, string>();
+                pairs.Add("adminID", adminInfo.AdminID.ToString());
+                pairs.Add("realName", adminInfo.RealName);
+                pairs.Add("mobile", adminInfo.Mobile);
+                pairs.Add("userName", adminInfo.UserName);
+                pairs.Add("position", adminInfo.Position.ToString());
+                pairs.Add("positionName", ((QZ_Enum_Positions)adminInfo.Position).GetEnumDescription());
+                pairs.Add("createTime", adminInfo.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                pairs.Add("adminToken", _iAdminInfoService.GetAdminUserToken(adminInfo));
+                return base.Write(EnumResponseCode.Success, data: pairs);
             }
-            QZ_Model_In_AdminInfo adminInfo = _iAdminInfoService.GetUserByUserNameOrMobile(UserName);
-            if (adminInfo == null)
+            catch (Exception e)
             {
-                return base.Write(EnumResponseCode.Error, "用户名或密码有误");
+
+                throw e;
             }
-            if (adminInfo.Status != 0)
-            {
-                return base.Write(EnumResponseCode.Error, "账号异常，请联系管理员");
-            }
-            if (adminInfo.Password.ToLower() != QZ_Helper_Encryption.Get32MD5String(Password).ToLower())
-            {
-                return base.Write(EnumResponseCode.Error, "用户名或密码有误");
-            }
-            Dictionary<string, string> pairs = new Dictionary<string, string>();
-            pairs.Add("adminID", adminInfo.AdminID.ToString());
-            pairs.Add("realName", adminInfo.RealName);
-            pairs.Add("mobile", adminInfo.Mobile);
-            pairs.Add("userName", adminInfo.UserName);
-            pairs.Add("position", adminInfo.Position.ToString());
-            pairs.Add("positionName", ((QZ_Enum_Positions)adminInfo.Position).GetEnumDescription());
-            pairs.Add("createTime", adminInfo.CreateTime.ToString("yyyy-MM-dd HH:mm:ss"));
-            pairs.Add("adminToken", _iAdminInfoService.GetAdminUserToken(adminInfo));
-            return base.Write(EnumResponseCode.Success, data: pairs);
         }
         #endregion
     }

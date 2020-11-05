@@ -168,23 +168,23 @@ namespace QZ.Service.Interview_Service
                         ExtInterviewDate = i.AddTime,
                         ExtRemarks = i.Remarks,
                         ExtArriveTime = b.ArriveTime,
-                        UserID = b.UserID,
+                        ExtInterviewID = i.ID,
                         IdentityNumber = b.IdentityNumber
                     }).OrderByDescending(p => p.ExtInterviewDate);
         }
 
         /// <summary>
-        /// 通过用户ID获取用户面试信息
+        /// 通过面试记录ID获取用户面试信息
         /// </summary>
-        /// <param name="uid">用户ID</param>
+        /// <param name="id">面试记录ID</param>
         /// <returns></returns>
-        public QZ_Model_In_UserBasicInfo GetInterviewInfoByUID(int uid)
+        public QZ_Model_In_UserBasicInfo GetInterviewInfoByInterviewID(int id)
         {
             return (from i in _InterviewRecords
                     join b in _UserBasicInfos on i.UserID equals b.UserID
-                    join p in _Positions on b.ApplyJob equals p.ID into p2
+                    join p in _Positions on i.ApplyJob equals p.ID into p2
                     from p in p2.DefaultIfEmpty()
-                    where i.UserID == uid
+                    where i.ID == id
                     select new QZ_Model_In_UserBasicInfo
                     {
                         RealName = b.RealName,
@@ -211,8 +211,27 @@ namespace QZ.Service.Interview_Service
                         LowSalary = b.LowSalary,
                         ExtRemarks = i.Remarks,
                         UserID = b.UserID,
-                        ExtInterviewDate = i.AddTime
-                    }).FirstOrDefault();
+                        ExtInterviewDate = i.AddTime,
+                        ExtInterviewID = i.ID
+                    }).OrderByDescending(p => p.ExtInterviewDate).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// 获取用户除此面试记录以外的历史面试记录
+        /// </summary>
+        /// <param name="interviewID">本次面试记录ID</param>
+        /// <param name="uid">用户ID</param>
+        /// <returns></returns>
+        public List<QZ_Model_In_UserBasicInfo> GetHistoryInterviews(int interviewID, int uid)
+        {
+            return _InterviewRecords.Where(p => p.ID != interviewID && p.UserID == uid).Select(p => new QZ_Model_In_UserBasicInfo
+            {
+                ExtInterviewDate = p.AddTime,
+                ExtRemarks = p.Remarks,
+                ExtInterviewID = p.ID,
+                ApplyJob = p.ApplyJob,
+                ExtSchedule = p.Schedule
+            }).OrderByDescending(p => p.ExtInterviewDate).ToList();
         }
         #endregion
     }

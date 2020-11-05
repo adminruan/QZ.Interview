@@ -227,27 +227,94 @@
             <div class="layui-col-md12">
                 <div class="layui-card">
                     <div class="layui-card-body">
-                        <div class="layui-tab layui-tab-brief" lay-filter="demo">
+                        <div class="layui-tab layui-tab-brief" lay-filter="lay-interviews">
                             <ul class="layui-tab-title">
                                 <li class="layui-this">面试信息</li>
                                 <li>历史记录</li>
                             </ul>
                             <div class="layui-tab-content">
                                 <div class="layui-tab-item layui-show">
-                                    <div class="layui-row">
-                                        <div class="layui-col-xs12 layui-col-md4">
-                                            <label>信息填报时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd HH:mm:ss")
-                                        </div>
-                                        <div class="layui-col-xs6 layui-col-md4">
-                                            <label>提交时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd")
-                                        </div>
-                                        <div class="layui-col-xs6 layui-col-md4">
-                                            <label>预计到岗时间：</label>@Model.ArriveTime.ToString("yyyy-MM-dd")
+                                    <div class="layui-card-body">
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs12 layui-col-md4">
+                                                <label>信息填报时间：</label>@Model.ExtInterviewDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                            </div>
                                         </div>
                                     </div>
+                                    @{
+                                        int i = 1;
+                                        foreach (var item in Model.ExtRemarkList)
+                                        {
+                                            <div class="layui-card-body">
+                                                <label>第 @i 轮面试</label>
+                                                <div class="layui-row">
+                                                    <div class="layui-col-xs6 layui-col-md4">
+                                                        <label>面试主管：</label>@item.AdminRealName
+                                                    </div>
+                                                    <div class="layui-col-xs6 layui-col-md4">
+                                                        <label>面试时间：</label>@item.AddTime.ToString("yyyy-MM-dd HH:mm:ss")
+                                                    </div>
+                                                </div>
+                                                <div class="layui-row">
+                                                    <div class="layui-col-xs6 layui-col-md4">
+                                                        <label>面试点评：</label>@item.Remark
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            i++;
+                                        }
+                                    }
                                 </div>
                                 <div class="layui-tab-item">
-                                    <div id="laydateDemo"></div>
+                                    @{
+                                        if (Model.ExtHistoryInterviews != null && Model.ExtHistoryInterviews.Count > 0)
+                                        {
+                                            foreach (var item in Model.ExtHistoryInterviews)
+                                            {
+                                                <div class="layui-card-body">
+                                                    <div class="layui-row">
+                                                        <div class="layui-col-xs12 layui-col-md4">
+                                                            <label>应聘岗位：</label>@item.ExtApplyJob
+                                                        </div>
+                                                        <div class="layui-col-xs12 layui-col-md4">
+                                                            <label>信息填报时间：</label>@item.ExtInterviewDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                                        </div>
+                                                        <div class="layui-col-xs12 layui-col-md4">
+                                                            <label>面试结果：</label>@item.ExtScheduleText
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                if (item.ExtRemarkList != null && item.ExtRemarkList.Count > 0)
+                                                {
+                                                    int x = 1;
+                                                    foreach (var son in item.ExtRemarkList)
+                                                    {
+                                                        <div class="layui-card-body">
+                                                            <label>第 @x 轮面试</label>
+                                                            <div class="layui-row">
+                                                                <div class="layui-col-xs6 layui-col-md4">
+                                                                    <label>面试主管：</label>@son.AdminRealName
+                                                                </div>
+                                                                <div class="layui-col-xs6 layui-col-md4">
+                                                                    <label>面试时间：</label>@son.AddTime.ToString("yyyy-MM-dd HH:mm:ss")
+                                                                </div>
+                                                            </div>
+                                                            <div class="layui-row">
+                                                                <div class="layui-col-xs6 layui-col-md4">
+                                                                    <label>面试点评：</label>@son.Remark
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        x++;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="not-data">无历史记录</div>
+                                        }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -256,5 +323,23 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        layui.use(['layer', 'table', 'form', 'laydate', 'element'], function () {
+            var form = layui.form
+                , laydate = layui.laydate
+                , $ = layui.jquery
+                , layer = layui.layer
+                , element = layui.element
+                , table = layui.table;
+
+            ////监听Tab切换
+            //element.on('tab(lay-interviews)', function (data) {
+            //    layer.tips('切换了 ' + data.index + '：' + this.innerHTML, this, {
+            //        tips: 1
+            //    });
+            //});
+        });
+
+    </script>
 </body>
 </html>

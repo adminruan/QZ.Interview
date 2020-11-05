@@ -1,4 +1,5 @@
 ﻿using QZ.Model.Expand;
+using QZ.Model.Expand.Interview;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -198,6 +199,18 @@ namespace QZ.Model.Interview
         /// </summary>
         [NotMapped]
         public string ExtRemarks { get; set; }
+
+        /// <summary>
+        /// 面试评语
+        /// </summary>
+        [NotMapped]
+        public List<Interview_InterviewerRemark> ExtRemarkList { get; set; }
+
+        /// <summary>
+        /// 历史面试记录
+        /// </summary>
+        [NotMapped]
+        public List<QZ_Model_In_UserBasicInfo> ExtHistoryInterviews { get; set; }
 
         /// <summary>
         /// 简历来源平台
