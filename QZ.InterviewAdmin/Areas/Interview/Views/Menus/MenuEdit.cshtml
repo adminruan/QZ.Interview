@@ -79,10 +79,12 @@
         layui.use(['layer', 'table', 'form', 'laydate'], function () {
             var $ = layui.jquery; //重点处
             var form = layui.form
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , layer = layui.layer;
 
             //监听提交
             form.on('submit(savechange)', function (data) {
+                var index = layer.load(1, { shaed: [0.0, '#fff'] });
                 $.ajax({
                     url: "/Interview/Menus/EditSaveChange",
                     type: 'POST',
@@ -90,6 +92,7 @@
                     data: JSON.stringify(data.field),
                     dataType: 'json',
                     success: function (d) {
+                        layer.close(index);
                         if (d.code == 1) {
                             layer.msg('保存成功', {
                                 icon: 1,
@@ -105,7 +108,8 @@
                                 time: 2000
                             });
                         }
-
+                    }, fail: function () {
+                        layer.close(index);
                     }
                 });
                 return false;

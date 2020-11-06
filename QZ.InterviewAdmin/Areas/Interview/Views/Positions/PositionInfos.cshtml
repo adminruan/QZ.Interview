@@ -1,0 +1,103 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>职位信息</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/layuiadmin/layui/layui.js"></script>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        职位信息
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="layui-row">
+                            <div class="layui-inline">
+                                <div class="layui-form">
+                                    <select id="Status" name="Status">
+                                        <option value="" selected>请选择状态</option>
+                                        <option value="true">启用</option>
+                                        <option value="false">禁用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="layui-btn layui-btn-md layui-bg-green" data-method="search"><i class="layui-icon">&#xe615;</i> 搜索</button>
+                        </div>
+                        <div class="layui-row">
+                            <table id="tab-position" lay-filter="lay-position"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*头部工具栏*@
+    <script type="text/html" id="toolbar">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" lay-event="add" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i> 添加</button>
+        </div>
+    </script>
+    @*行内工具栏*@
+    <script type="text/html" id="linebar">
+        <a class="layui-btn layui-btn-sm" lay-event="event-edit" style="line-height:28px">编辑</a>
+    </script>
+    <script type="text/javascript">
+        var active, $, layer, table;
+        layui.use(['layer', 'table', 'form', 'laydate'], function () {
+            var form = layui.form
+                , laydate = layui.laydate;
+            $ = layui.jquery, layer = layui.layer, table = layui.table;
+            //事件定义
+            active = {
+                setTable: function () {
+                    table.render({
+                        elem: '#tab-position'
+                        , id: 'tab-position'
+                        , url: '/Interview/Positions/GetPositionInfos' //数据接口
+                        , title: '职位信息'
+                        , page: true //开启分页
+                        , limit: 20
+                        , limits: [20, 50, 100]
+                        , where: { 'status': $('#Status').val() }
+                        , toolbar: '#toolbar'
+                        , cols: [[ //表头
+                            { field: 'ID', sort: true, title: '编号', align: 'center' }
+                            , { field: 'PositionName', title: '职位', align: 'center' }
+                            , { field: 'State', title: '状态', align: 'center', templet: function (d) { return d.Satae == true ? "启用" : "禁用"; } }
+                            , { field: 'AddTime', title: '增添时间', align: 'center' }
+                            , { fixed: '', title: '操作', align: 'center', width: '15%', toolbar: '#linebar' }
+                        ]]
+                    });
+                },
+                search: function () {
+                    var that = this;
+                    active.setTable();
+                },
+                openedit: function (id) {
+                    layer.open({
+                        type: 2,
+                        closeBtn: 2,
+                        title: '管理员信息编辑',
+                        area: ['860px', '410px'],
+                        content: '../Positions/PositionsEdit?id=' + id,
+                        end: function () {
+                        }
+                    });
+                }
+            };
+            //初始化
+            active.setTable();
+        });
+    </script>
+</body>
+</html>
