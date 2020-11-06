@@ -10,17 +10,30 @@ namespace QZ.Common
         /// 链接字符
         /// </summary>
         public static readonly string Interview_Conn = QZ_Helper_ConfigHelper.GetSectionValue("ConnectionStrings:Interview_Conn");
+
         /// <summary>
         /// 是否记录全局日志 1：记录 否则不记录
         /// </summary>
         public static readonly string isErrorLog = QZ_Helper_ConfigHelper.GetSectionValue("StymeSetup:IsErrorLog");
+
         /// <summary>
         /// 是否加密数据库连接字符串 1：加密，0：不加密
         /// </summary>
         public static readonly string isPwd = QZ_Helper_ConfigHelper.GetSectionValue("StymeSetup:IsPwd");
+
         /// <summary>
         /// 页面解密路径Key
         /// </summary>
         public static readonly string passWordKey = QZ_Helper_ConfigHelper.GetSectionValue("StymeSetup:PassWordKey");
+
+        /// <summary>
+        /// 题多多合伙人公众号APPID
+        /// </summary>
+        public static readonly string PartnerAPPID = QZ_Helper_ConfigHelper.GetSectionValue("OfficialAccounts:TDDPartner:APPID");
+
+        /// <summary>
+        /// 题多多校园合伙人公众号通讯秘钥
+        /// </summary>
+        public static readonly string PartnerAPPSecret = QZ_Helper_ConfigHelper.GetSectionValue("OfficialAccounts:TDDPartner:APPSecretKey");
     }
 }

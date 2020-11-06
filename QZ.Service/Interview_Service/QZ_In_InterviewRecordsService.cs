@@ -31,14 +31,16 @@ namespace QZ.Service.Interview_Service
         /// </summary>
         /// <param name="uid">用户ID</param>
         /// <param name="adminID">负责处理管理员ID</param>
+        /// <param name="applyJob">应聘岗位</param>
         /// <returns></returns>
-        public bool SubmitInterviewRecord(int uid, int adminID)
+        public bool SubmitInterviewRecord(int uid, int adminID, int applyJob)
         {
             QZ_Model_In_InterviewRecords record = new QZ_Model_In_InterviewRecords();
             record.UserID = uid;
             record.Schedule = (int)QZ_Enum_Schedules.AwaitPlan;
             record.AddTime = DateTime.Now;
             record.InterviewerAdminIds = $"{adminID}|";
+            record.ApplyJob = applyJob;
             return base.Insert(record).ID > 0;
         }
 

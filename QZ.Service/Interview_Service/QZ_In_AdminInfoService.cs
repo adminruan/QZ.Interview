@@ -52,6 +52,16 @@ namespace QZ.Service.Interview_Service
                 Position = p.Position
             }).OrderBy(p => p.RealName).ToList();
         }
+
+        /// <summary>
+        /// 通过AdminID获取管理员
+        /// </summary>
+        /// <param name="adminID"></param>
+        /// <returns></returns>
+        public QZ_Model_In_AdminInfo GEtUserInfoByAdminID(int adminID)
+        {
+            return _AdminInfos.FirstOrDefault(p => p.AdminID == adminID);
+        }
         #endregion
     }
 }

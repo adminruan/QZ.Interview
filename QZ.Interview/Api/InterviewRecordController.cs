@@ -22,16 +22,19 @@ namespace QZ.Interview.Api
     public class InterviewRecordController : InterviewControllerBase
     {
 
-        public InterviewRecordController(QZ_In_IAdminInfoService iAdminInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService, QZ_In_IPositionsService iPositionsService) : base(iAdminInfoService)
+        public InterviewRecordController(QZ_In_IAdminInfoService iAdminInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService, QZ_In_IPositionsService iPositionsService,
+            QZ_In_IUserBasicInfoService iUserBasicInfoService) : base(iAdminInfoService)
         {
             this._iAdminInfoService = iAdminInfoService;
             this._iInterviewRecordsService = iInterviewRecordsService;
             this._iPositionsService = iPositionsService;
+            this._iUserBasicInfoService = iUserBasicInfoService;
         }
         private readonly static object _obj = new object();
         private readonly QZ_In_IInterviewRecordsService _iInterviewRecordsService;
         private readonly QZ_In_IAdminInfoService _iAdminInfoService;
         private readonly QZ_In_IPositionsService _iPositionsService;
+        private readonly QZ_In_IUserBasicInfoService _iUserBasicInfoService;
 
         #region 获取面试信息列表
         /// <summary>
@@ -194,7 +197,19 @@ namespace QZ.Interview.Api
                     //通知面试官面试模板
                     if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
                     {
-                        QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 2));
+                        QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == interviewInfo.UserID);
+                        if (basicInfo != null)
+                        {
+                            Dictionary<string, string> pairs = new Dictionary<string, string>();
+                            pairs.Add("first", $"您好！应聘“{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}”职位的候选人已到达，请您尽快前往会议室面试。");
+                            pairs.Add("keyword1", $"{basicInfo.RealName} | {basicInfo.Gender} | {basicInfo.Age} | {basicInfo.Education}");
+                            pairs.Add("keyword2", $"-");
+                            pairs.Add("keyword3", $"{DateTime.Now.Date.ToString("yyyy-MM-dd")}");
+                            pairs.Add("keyword4", $"{((QZ_Enum_Schedules)interviewInfo.Schedule).GetEnumDescription()}");
+                            pairs.Add("keyword5", $"{adminInfo.RealName}");
+                            pairs.Add("remark", "");
+                            QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, pairs, QZ_Helper_Constant.PartnerAPPID, "/pages/manager/pages/handleInfo/handleInfo", type: 2));
+                        }
                     }
 
                     return base.Write(EnumResponseCode.Success, "分配成功");
@@ -239,6 +254,11 @@ namespace QZ.Interview.Api
                 if (interviewInfo.Schedule >= (int)QZ_Enum_Schedules.PendingApproval)
                 {
                     return base.Write(EnumResponseCode.Error, "面试已结束");
+                }
+                QZ_Model_In_AdminInfo nextAdminInfo = _iAdminInfoService.GEtUserInfoByAdminID(InterviewAdminID);
+                if (nextAdminInfo == null)
+                {
+                    return base.Write(EnumResponseCode.Error, "下轮面试官不存在");
                 }
                 switch (Status)
                 {
@@ -300,15 +320,33 @@ namespace QZ.Interview.Api
                     interviewInfo.Remarks = JsonConvert.SerializeObject(remarks);
                 }
 
-                //面试通过给面试者、下轮面试官发送微信公众号消息提醒
-                //if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
-                //{
-                //    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 2));
-                //}
-                //if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
-                //{
-                //    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, "appid", "页面路由", type: 3));
-                //}
+
+                //下轮面试官发送微信公众号消息提醒
+                if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+                {
+                    QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == interviewInfo.UserID);
+                    if (basicInfo != null)
+                    {
+                        string path = "";
+                        Dictionary<string, string> pairs = new Dictionary<string, string>();
+                        if (interviewInfo.Schedule == (int)QZ_Enum_Schedules.PendingApproval)
+                        {
+                            pairs.Add("first", $"您好！应聘“{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}”职位的候选人已通过前两轮面试，请您尽快批准。");
+                        }
+                        else
+                        {
+                            pairs.Add("first", $"您好！应聘“{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}”职位的候选人已到达，请您尽快前往会议室面试。");
+                            path = "/pages/manager/pages/handleInfo/handleInfo";
+                        }
+                        pairs.Add("keyword1", $"{basicInfo.RealName} | {basicInfo.Gender} | {basicInfo.Age} | {basicInfo.Education}");
+                        pairs.Add("keyword2", $"-");
+                        pairs.Add("keyword3", $"{DateTime.Now.Date.ToString("yyyy-MM-dd")}");
+                        pairs.Add("keyword4", $"{((QZ_Enum_Schedules)interviewInfo.Schedule).GetEnumDescription()}");
+                        pairs.Add("keyword5", $"{nextAdminInfo.RealName}");
+                        pairs.Add("remark", "");
+                        QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(nextAdminInfo.OpenID, pairs, QZ_Helper_Constant.PartnerAPPID, path, type: 2));
+                    }
+                }
 
                 _iInterviewRecordsService.Update(interviewInfo);
                 return base.Write(EnumResponseCode.Success);
@@ -357,7 +395,19 @@ namespace QZ.Interview.Api
                 interviewInfo.EntryTime = EntryTime;
                 _iInterviewRecordsService.Update(interviewInfo);
 
-                //给面试者发送微信公众号消息提醒
+                if (QZ_Helper_Wechat.GetAccessToken(out string accessToken, QZ_Helper_Constant.PartnerAPPID, QZ_Helper_Constant.PartnerAPPSecret))
+                {
+                    QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == interviewInfo.UserID);
+                    //给面试者发送微信公众号消息提醒
+                    Dictionary<string, string> pairs = new Dictionary<string, string>();
+                    pairs.Add("first", $"{basicInfo?.RealName ?? "-"}，您好！恭喜您通过面试，被我公司录用");
+                    pairs.Add("keyword1", $"长沙求知");
+                    pairs.Add("keyword2", $"{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}");
+                    pairs.Add("keyword3", "录取");
+                    pairs.Add("remark", "我们期待您的加入！");
+                    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(adminInfo.OpenID, pairs, QZ_Helper_Constant.PartnerAPPID, "/pages/interviewer/pages/notification/notification", type: 3));
+
+                }
 
                 return base.Write(EnumResponseCode.Success, "审批成功");
             }

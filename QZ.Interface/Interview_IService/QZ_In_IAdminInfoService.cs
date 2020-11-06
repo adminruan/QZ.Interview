@@ -27,6 +27,13 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <returns></returns>
         List<QZ_Model_In_AdminInfo> GetAdminList();
+
+        /// <summary>
+        /// 通过AdminID获取管理员
+        /// </summary>
+        /// <param name="adminID"></param>
+        /// <returns></returns>
+        QZ_Model_In_AdminInfo GEtUserInfoByAdminID(int adminID);
         #endregion
     }
 }

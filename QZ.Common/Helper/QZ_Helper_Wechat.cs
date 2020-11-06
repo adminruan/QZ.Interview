@@ -35,7 +35,7 @@ namespace QZ.Common
         /// <param name="appSerect">凭证密钥</param>
         /// <param name="accessToken">用户令牌</param>
         /// <returns></returns>
-        public static bool GetAccessToken(out string accessToken, string appID = "", string appSerect = "")
+        public static bool GetAccessToken(out string accessToken, string appID = "wx0d13958f771fb415", string appSerect = "b4a9317fc2f33f915a4f154e68e6050b")
         {
             try
             {
@@ -102,12 +102,11 @@ namespace QZ.Common
         /// 公众号消息模板
         /// </summary>
         /// <param name="openId">接受消息用户OpenID</param>
-        /// <param name="templateId">消息模板ID</param>
         /// <param name="appID">点击模板消息需要跳转的小程序</param>
         /// <param name="pagePath">所需跳转到小程序的具体页面路径，支持带参数,（示例index?foo=bar）</param>
-        /// <param name="type">1：待处理面试通知模板、2：通知面试官面试模板</param>
+        /// <param name="type">1：新简历通知模板、2：面试官面试提醒模板、3：面试录取通知模板</param>
         /// <returns></returns>
-        public static string AwaitInterviewTemplate(string openId, string templateId = "nuoUIwDpMb1T_MrcU1WkG0UV-HclVR0Jl7lWBdf4-Tg", string appID = "", string pagePath = "", int type = 1)
+        public static string AwaitInterviewTemplate(string openId, Dictionary<string, string> pairs, string appID = "", string pagePath = "", int type = 1)
         {
             Dictionary<string, dynamic> parameter = new Dictionary<string, dynamic>();
             parameter.Add("touser", openId);
@@ -119,17 +118,45 @@ namespace QZ.Common
                     miniProgramData.Add("pagepath", pagePath);
                 parameter.Add("miniprogram", miniProgramData);
             }
-            parameter.Add("template_id", templateId);//消息模板ID
 
             switch (type)
             {
                 case 2:
-                    //通知面试官面试模板
-                    parameter.Add("data", "这里是待发送的数据信息");
+                    /* 面试官面试提醒模板
+                     * {{first.DATA}}
+                     * 详情：{{keyword1.DATA}}
+                     * 最近雇主：{{keyword2.DATA}}
+                     * 面试时间：{{keyword3.DATA}}
+                     * 面试类别：{{keyword4.DATA}}
+                     * 面试官：{{keyword5.DATA}}
+                     * {{remark.DATA}}
+                     */
+                    parameter.Add("template_id", "0qgfRwtXnqI_LsFFPOK7IXURP-Gb1rmtMBOUSxVLiUQ");
+                    parameter.Add("data", pairs);
+                    break;
+                case 3:
+                    /* 面试录取通知模板
+                     * {{first.DATA}}
+                     * 面试职位：{{keyword1.DATA}}
+                     * 面试时间：{{keyword2.DATA}}
+                     * 面试结果：{{keyword3.DATA}}
+                     * {{remark.DATA}}
+                     */
+                    parameter.Add("template_id", "AO-ih1NcoWewWizQXtba3uFFF0-2Wrux6xisJFmUmwY");
+                    parameter.Add("data", pairs);
                     break;
                 default:
-                    //待处理面试通知模板
-                    parameter.Add("data", "这里是待发送的数据信息");
+                    /* 新简历通知模板
+                     * {{first.DATA}}
+                     * 姓名：{{keyword1.DATA}}
+                     * 学校：{{keyword2.DATA}}
+                     * 专业：{{keyword3.DATA}}
+                     * 学历：{{keyword4.DATA}}
+                     * 投递岗位：{{keyword5.DATA}}
+                     * {{remark.DATA}}
+                     */
+                    parameter.Add("template_id", "-CBIkXqS3xY_IskwmyjBS1eBnx3eSjgngA8YXAOt39c");
+                    parameter.Add("data", pairs);
                     break;
             }
             return JsonConvert.SerializeObject(parameter);

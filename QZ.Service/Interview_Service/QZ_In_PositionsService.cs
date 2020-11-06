@@ -26,6 +26,16 @@ namespace QZ.Service.Interview_Service
         {
             return _Positions.Where(p => p.State && p.PositionName != "总经理").ToList();
         }
+
+        /// <summary>
+        /// 通过ID获取职位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public QZ_Model_In_Positions GetInfoByID(int id)
+        {
+            return _Positions.Find(id);
+        }
         #endregion
     }
 }

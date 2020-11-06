@@ -15,8 +15,9 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <param name="uid">用户ID</param>
         /// <param name="adminID">负责处理管理员ID</param>
+        /// <param name="applyJob">应聘岗位</param>
         /// <returns></returns>
-        bool SubmitInterviewRecord(int uid, int adminID);
+        bool SubmitInterviewRecord(int uid, int adminID, int applyJob);
 
         /// <summary>
         /// 更新下轮面试人

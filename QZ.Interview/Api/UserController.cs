@@ -18,12 +18,13 @@ namespace QZ.Interview.Api
     public class UserController : InterviewControllerBase
     {
         public UserController(QZ_In_IUserService iUserService, QZ_In_IUserBasicInfoService iUserBasicInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService,
-            QZ_In_IAdminInfoService iAdminInfoService) : base(iUserService)
+            QZ_In_IAdminInfoService iAdminInfoService, QZ_In_IPositionsService iPositionsService) : base(iUserService)
         {
             this._iUserService = iUserService;
             this._iUserBasicInfoService = iUserBasicInfoService;
             this._iInterviewRecordsService = iInterviewRecordsService;
             this._iAdminInfoService = iAdminInfoService;
+            this._iPositionsService = iPositionsService;
         }
         private readonly static string _APPID = "";
         private readonly static string _APPSECRET = "";
@@ -32,6 +33,7 @@ namespace QZ.Interview.Api
         private readonly QZ_In_IUserBasicInfoService _iUserBasicInfoService;
         private readonly QZ_In_IInterviewRecordsService _iInterviewRecordsService;
         private readonly QZ_In_IAdminInfoService _iAdminInfoService;
+        private readonly QZ_In_IPositionsService _iPositionsService;
 
         #region 普通用户登录、注册
         /// <summary>
@@ -212,16 +214,26 @@ namespace QZ.Interview.Api
                 return base.Write(EnumResponseCode.Error, "无可用行政信息");
             }
             //提交面试信息
-            if (_iInterviewRecordsService.SubmitInterviewRecord(model.UserID, admins.First().AdminID))
+            if (_iInterviewRecordsService.SubmitInterviewRecord(model.UserID, admins.First().AdminID, model.ApplyJob))
             {
                 return base.Write(EnumResponseCode.Error, "面试申请提交失败");
             }
             //给人事发送微信公众号消息通知
-            if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+            if (QZ_Helper_Wechat.GetAccessToken(out string accessToken, QZ_Helper_Constant.PartnerAPPID, QZ_Helper_Constant.PartnerAPPSecret))
             {
+                List<QZ_Model_In_Positions> positions = _iPositionsService.GetPositions() ?? new List<QZ_Model_In_Positions>();
                 foreach (var item in admins)
                 {
-                    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(item.OpenID, _APPID, "页面路由"));
+                    Dictionary<string, string> pairs = new Dictionary<string, string>();
+                    pairs.Add("first", "您收到一封新简历");
+                    pairs.Add("keyword1", $"{model.RealName}");
+                    Interview_UserEducation deucationInfo = model.Educations.OrderByDescending(p => p.AdmissionTime).FirstOrDefault();
+                    pairs.Add("keyword2", $"{deucationInfo?.School ?? "-"}");
+                    pairs.Add("keyword3", $"{deucationInfo?.Major ?? "-"}");
+                    pairs.Add("keyword4", $"{model.Education}");
+                    pairs.Add("keyword5", $"{positions.FirstOrDefault(p => p.ID == model.ApplyJob)?.PositionName ?? "-"}");
+                    pairs.Add("remark", "点击详情，分配面试");
+                    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(item.OpenID, pairs, QZ_Helper_Constant.PartnerAPPID, "", type: 1));
                 }
             }
 

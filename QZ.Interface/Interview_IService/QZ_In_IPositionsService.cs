@@ -13,6 +13,13 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <returns></returns>
         List<QZ_Model_In_Positions> GetPositions();
+
+        /// <summary>
+        /// 通过ID获取职位信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        QZ_Model_In_Positions GetInfoByID(int id);
         #endregion
     }
 }
