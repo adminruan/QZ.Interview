@@ -73,7 +73,7 @@
                         , cols: [[ //表头
                             { field: 'ID', sort: true, title: '编号', align: 'center' }
                             , { field: 'PositionName', title: '职位', align: 'center' }
-                            , { field: 'State', title: '状态', align: 'center', templet: function (d) { return d.Satae == true ? "启用" : "禁用"; } }
+                            , { field: 'State', title: '状态', align: 'center', templet: function (d) { return d.State ? "<span style='color:#07c160;'>启用</span>" : "<span style='color:#c5c5c5;'>禁用</span>"; } }
                             , { field: 'AddTime', title: '增添时间', align: 'center' }
                             , { fixed: '', title: '操作', align: 'center', width: '15%', toolbar: '#linebar' }
                         ]]
@@ -87,9 +87,9 @@
                     layer.open({
                         type: 2,
                         closeBtn: 2,
-                        title: '管理员信息编辑',
-                        area: ['860px', '410px'],
-                        content: '../Positions/PositionsEdit?id=' + id,
+                        title: '职位编辑',
+                        area: ['460px', '300px'],
+                        content: '../Positions/EditPositions?id=' + id,
                         end: function () {
                         }
                     });
@@ -97,6 +97,24 @@
             };
             //初始化
             active.setTable();
+            //按钮事件监听
+            $('.layui-fluid .layui-row .layui-col-md12 .layui-btn').on('click', function () {
+                var that = this;
+                var method = $(that).data('method');
+                active[method] && active[method].call(that);
+            });
+            //行内事件监听
+            table.on('tool(lay-position)', function (obj) {
+                var d = obj.data;
+                var e = obj.event;
+                var that = this;
+                switch (e) {
+                    case 'event-edit':
+                    default:
+                        active.openedit(d.ID);
+                        return;
+                }
+            });
         });
     </script>
 </body>

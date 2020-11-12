@@ -69,6 +69,18 @@ namespace QZ.Interface.Interview_IService
         /// <param name="uid">用户ID</param>
         /// <returns></returns>
         List<QZ_Model_In_UserBasicInfo> GetHistoryInterviews(int interviewID, int uid);
+
+        /// <summary>
+        /// 获取今日面试人员ixnxi
+        /// </summary>
+        /// <returns></returns>
+        List<QZ_Model_In_InterviewRecords> GetTodayInterviewInfo();
+
+        /// <summary>
+        /// 获取本月应聘人数
+        /// </summary>
+        /// <returns></returns>
+        int GetThisMonthInterviewNumber();
         #endregion
     }
 }

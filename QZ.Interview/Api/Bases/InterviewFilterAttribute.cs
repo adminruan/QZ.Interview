@@ -56,7 +56,7 @@ namespace QZ.Interview.Api.Bases
                         data.msg += error.ErrorMessage + "|";
                     }
                 }
-                data.msg = QZ_Helper_Encryption.Base64Encode(data.msg);
+                data.msg = QZ_Helper_Encryption.Base64Encode(data.msg.Substring(0, data.msg.Length - 1));
                 context.Result = new JsonResult(data);
             }
             return;

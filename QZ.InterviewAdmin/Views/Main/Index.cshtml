@@ -3,6 +3,48 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@model Tuple<int, Dictionary<string, int>, int>
+<style type="text/css">
+    .month {
+        padding: 0 0 0 25px;
+    }
 
-<h1>我是主页</h1>
+    .position {
+        font-size: 20px;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-sm6">
+            <div class="layui-card">
+                <div class="layui-card-header">本月</div>
+                <div class="layui-card-body">
+                    <div class="month">
+                        <p class="position">应聘人数 <span style=" font-size: 35px;">@Model.Item1</span>人</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-sm6">
+            <div class="layui-card">
+                <div class="layui-card-header">今日应聘人员</div>
+                <div class="layui-card-body">
+                    <div class="layui-row">
+                        @{
+                            foreach (var item in Model.Item2)
+                            {
+                                <div class="layui-col-xs6" style="margin-top:15px;">
+                                    <div class="grid-demo grid-demo-bg1">
+                                        <span class="position">@item.Key</span> <span class="position">@item.Value 人</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        <p style="margin-top:10px;">共 @Model.Item3 人</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 

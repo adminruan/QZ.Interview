@@ -10,10 +10,10 @@ namespace QZ.Model.Expand
     /// </summary>
     public class Interview_BaseAuthority
     {
-        [Required(ErrorMessage = "UserID invalid")]
+        [Required(ErrorMessage = "{0}无效")]
         public int UserID { get; set; }
 
-        [Required(ErrorMessage = "UserToken invalid")]
+        [Required(ErrorMessage = "{0}无效")]
         public string UserToken { get; set; }
 
         public string Source { get; set; }

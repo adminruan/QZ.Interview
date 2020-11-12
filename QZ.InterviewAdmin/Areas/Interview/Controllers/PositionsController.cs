@@ -46,15 +46,46 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
         #endregion
 
         #region 职位编辑
-        //[Area("Interview")]
-        //[HttpPost]
-        //public IActionResult PositionEdit(QZ_Model_In_Positions model)
-        //{
-        //    if (model == null)
-        //    {
-        //        return ContentTips(EnumResponseCode.Error, "提交的数据为空");
-        //    }
-        //}
+        [Area("Interview")]
+        public IActionResult EditPositions(int id)
+        {
+            QZ_Model_In_Positions data = new QZ_Model_In_Positions();
+            if (id > 0)
+            {
+                data = _iPositionsService.Find<QZ_Model_In_Positions>(id);
+            }
+            return View(data);
+        }
+
+        [Area("Interview")]
+        [HttpPost]
+        public IActionResult SaveChange(QZ_Model_In_Positions model)
+        {
+            if (model == null)
+            {
+                return ContentTips(EnumResponseCode.Error, "提交的数据为空");
+            }
+            if (!ModelState.IsValid)
+            {
+                return ContentTips(EnumResponseCode.Error, "提交的数据有误");
+            }
+            if (_iPositionsService.Any<QZ_Model_In_Positions>(p => p.ID != model.ID && p.State && p.PositionName == model.PositionName))
+            {
+                return ContentTips(EnumResponseCode.Error, "请勿重复配置同一职位");
+            }
+            if (model.ID > 0)
+            {
+                //编辑
+                _iPositionsService.Update(model);
+            }
+            else
+            {
+                //新增
+                model.AddTime = DateTime.Now;
+                _iPositionsService.Insert(model);
+            }
+            return ContentTips(EnumResponseCode.Success, "操作成功");
+        }
         #endregion
     }
 }

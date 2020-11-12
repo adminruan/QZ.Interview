@@ -10,42 +10,40 @@ namespace QZ.Model.Expand
     /// </summary>
     public class Interview_UserBasicInfo : Interview_BaseAuthority
     {
-        //public int ID { get; set; }
-
         /// <summary>
         /// 真实姓名
         /// </summary>
-        [Required(ErrorMessage = "请输入真实姓名")]
+        [Required(ErrorMessage = "{0}有误")]
         public string RealName { get; set; }
 
         /// <summary>
         /// 性别
         /// </summary>
-        [Required(ErrorMessage = "请选择性别")]
+        [Required(ErrorMessage = "{0}有误")]
         public string Gender { get; set; }
 
         /// <summary>
         /// 民族
         /// </summary>
-        [Required(ErrorMessage = "请输入民族")]
+        [Required(ErrorMessage = "{0}有误")]
         public string Nation { get; set; }
 
         /// <summary>
         /// 学历
         /// </summary>
-        [Required(ErrorMessage = "请输入文化程度")]
+        [Required(ErrorMessage = "{0}有误")]
         public string Education { get; set; }
 
         /// <summary>
         /// 身份证号码
         /// </summary>
-        [StringLength(18, ErrorMessage = "身份证号码有误")]
+        [StringLength(18, ErrorMessage = "{0}有误")]
         public string IdentityNumber { get; set; }
 
         /// <summary>
         /// 出生日期
         /// </summary>
-        [Required(ErrorMessage = "请输入出生年月")]
+        [Required(ErrorMessage = "{0}有误")]
         public DateTime BirthDate { get; set; }
 
         /// <summary>
@@ -74,8 +72,8 @@ namespace QZ.Model.Expand
         /// <summary>
         /// 联系方式
         /// </summary>
-        [Required(ErrorMessage = "请输入联系方式")]
-        [StringLength(11, ErrorMessage = "请填写真确的手机号码")]
+        [Required(ErrorMessage = "{0}有误")]
+        [StringLength(11, ErrorMessage = "请正确填写{0}")]
         public string Moblie { get; set; }
 
         /// <summary>
@@ -86,52 +84,52 @@ namespace QZ.Model.Expand
         /// <summary>
         /// 紧急联系人
         /// </summary>
-        [Required(ErrorMessage = "请输入紧急联系人姓名")]
+        [Required(ErrorMessage = "{0}有误")]
         public string EmergencyContact { get; set; }
 
         /// <summary>
         /// 紧急联系电话
         /// </summary>
-        [Required(ErrorMessage = "请输入紧急联系号码")]
-        [StringLength(11, ErrorMessage = "请填写真确的手机号码")]
+        [Required(ErrorMessage = "{0}有误")]
+        [StringLength(11, ErrorMessage = "{0}有误")]
         public string EmergencyMobile { get; set; }
 
         /// <summary>
         /// 与紧急联系人的关系
         /// </summary>
-        [Required(ErrorMessage = "请选择紧急联系关系")]
+        [Required(ErrorMessage = "{0}有误")]
         public string Relation { get; set; }
 
         /// <summary>
         /// 申请的职位
         /// </summary>
-        [Required(ErrorMessage = "请选择应聘岗位")]
+        [Required(ErrorMessage = "{0}有误")]
         public int ApplyJob { get; set; }
 
         /// <summary>
         /// 期望薪资
         /// </summary>
-        [Required(ErrorMessage = "请输入期望薪资")]
-        [Range(1, 999999, ErrorMessage = "请真确填写薪资")]
+        [Required(ErrorMessage = "{0}有误")]
+        [Range(1, 999999, ErrorMessage = "{0}有误")]
         public decimal ExpectSalary { get; set; }
 
         /// <summary>
         /// 可接受薪资
         /// </summary>
-        [Required(ErrorMessage = "请输入可接受薪资")]
-        [Range(1, 999999, ErrorMessage = "请真确填写薪资")]
+        [Required(ErrorMessage = "{0}有误")]
+        [Range(1, 999999, ErrorMessage = "{0}有误")]
         public decimal LowSalary { get; set; }
 
         /// <summary>
         /// 到岗时间
         /// </summary>
-        [Required(ErrorMessage = "请输入到岗时间")]
+        [Required(ErrorMessage = "{0}有误")]
         public DateTime ArriveTime { get; set; }
 
         /// <summary>
         /// 简历来源平台
         /// </summary>
-        [Required(ErrorMessage = "请选择简历来源")]
+        [Required(ErrorMessage = "{0}有误")]
         public int ResumeSource { get; set; }
 
         /// <summary>

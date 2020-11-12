@@ -14,7 +14,7 @@ using System.Linq;
 namespace QZ.Interview.Api
 {
     [Route("api/User/[action]")]
-    [ApiController]
+    //[ApiController]
     public class UserController : InterviewControllerBase
     {
         public UserController(QZ_In_IUserService iUserService, QZ_In_IUserBasicInfoService iUserBasicInfoService, QZ_In_IInterviewRecordsService iInterviewRecordsService,

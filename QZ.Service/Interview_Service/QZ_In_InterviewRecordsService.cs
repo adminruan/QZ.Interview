@@ -235,6 +235,28 @@ namespace QZ.Service.Interview_Service
                 ExtSchedule = p.Schedule
             }).OrderByDescending(p => p.ExtInterviewDate).ToList();
         }
+
+        /// <summary>
+        /// 获取今日面试人员ixnxi
+        /// </summary>
+        /// <returns></returns>
+        public List<QZ_Model_In_InterviewRecords> GetTodayInterviewInfo()
+        {
+            return _InterviewRecords.Where(p => p.AddTime >= DateTime.Now.Date).Select(p => new QZ_Model_In_InterviewRecords
+            {
+                UserID = p.UserID,
+                ApplyJob = p.ApplyJob
+            }).ToList();
+        }
+
+        /// <summary>
+        /// 获取本月应聘人数
+        /// </summary>
+        /// <returns></returns>
+        public int GetThisMonthInterviewNumber()
+        {
+            return _InterviewRecords.Where(p => p.AddTime.Month >= DateTime.Now.Month).Select(p => p.UserID).ToList().GroupBy(p => p).Count();
+        }
         #endregion
     }
 }
