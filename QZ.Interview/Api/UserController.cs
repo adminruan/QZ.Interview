@@ -184,6 +184,7 @@ namespace QZ.Interview.Api
         /// <param name="model">提交信息</param>
         /// <returns></returns>
         [HttpPost]
+        [NotSignVerify]
         public JsonResult SubmitBasicInfo([FromForm]Interview_UserBasicInfo model)
         {
             if (model == null || !ModelState.IsValid)
