@@ -46,13 +46,14 @@ namespace QZ.Interview.Api
         /// <param name="Page">页码</param>
         /// <param name="Scheduls">已处理的状态类型（301：不合适、302：备用、303：合适）</param>
         /// <returns></returns>
-        public JsonResult GetInterviewInfos(int AdminID, string AdminToken, bool Type, int Page, byte? Scheduls)
+        public JsonResult GetInterviewInfos(int AdminID, string AdminToken, bool Type, int Page, int Limit, int? Scheduls)
         {
             if (!base.ValidAdminUser(AdminID, AdminToken, out QZ_Model_In_AdminInfo adminInfo))
             {
                 return base.Write(EnumResponseCode.NotSignIn, "未登录");
             }
             Page = Page < 1 ? 1 : Page;
+            Limit = Limit < 1 ? 10 : Limit;
             var data = _iInterviewRecordsService.GetDataInterview();
             if (!data.Any())
             {
@@ -97,7 +98,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "暂无数据");
             }
-            List<QZ_Model_In_UserBasicInfo> list = data.Skip((Page - 1) * 20).Take(20).ToList();
+            List<QZ_Model_In_UserBasicInfo> list = data.Skip((Page - 1) * Limit).Take(Limit).ToList();
             int totalPage = data.Count().CalculateTotalPageNumber(20);
             Dictionary<string, string> pairs = new Dictionary<string, string>();
             pairs.Add("page", Page.ToString());
