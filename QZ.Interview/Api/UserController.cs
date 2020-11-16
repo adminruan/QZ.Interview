@@ -163,15 +163,21 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "暂无信息");
             }
-            if (!string.IsNullOrWhiteSpace(basicInfo.Educations))
+            try
             {
-                List<Interview_UserEducation> educations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(basicInfo.Educations);
-                basicInfo.ExtEducations = educations;
+                if (!string.IsNullOrWhiteSpace(basicInfo.Educations))
+                {
+                    List<Interview_UserEducation> educations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(basicInfo.Educations);
+                    basicInfo.ExtEducations = educations;
+                }
+                if (!string.IsNullOrWhiteSpace(basicInfo.Jobs))
+                {
+                    List<Interview_UserHistoryJob> jobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(basicInfo.Jobs);
+                    basicInfo.ExtJobs = jobs;
+                }
             }
-            if (!string.IsNullOrWhiteSpace(basicInfo.Jobs))
+            catch (Exception)
             {
-                List<Interview_UserHistoryJob> jobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(basicInfo.Jobs);
-                basicInfo.ExtJobs = jobs;
             }
             return base.Write(basicInfo, "ID|Educations|Jobs|ExtInterviewID|ExtInterviewDate|ExtSchedule|ExtAdminIds", false);
         }

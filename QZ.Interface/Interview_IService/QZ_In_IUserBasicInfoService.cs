@@ -1,4 +1,5 @@
 ﻿using QZ.Model.Expand;
+using QZ.Model.Expand.Interview;
 using QZ.Model.Interview;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,20 @@ namespace QZ.Interface.Interview_IService
         /// <param name="basicInfo">返回基本信息</param>
         /// <returns></returns>
         bool SubmitBasicInfo(Interview_UserBasicInfo info, out QZ_Model_In_UserBasicInfo basicInfo);
+
+        /// <summary>
+        /// 更新用户基本信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        bool UpdateBasicInfo(Interview_UserBasicInfoNew model);
+
+        /// <summary>
+        /// 更新用户职位及薪资
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        bool UpdateUserApplyJobs(Interview_UserApplyJobs model);
         #endregion
     }
 }

@@ -107,6 +107,12 @@ namespace QZ.Model.Interview
         public string EmergencyMobile { get; set; }
 
         /// <summary>
+        /// 与紧急联系人的关系
+        /// </summary>
+        [StringLength(10)]
+        public string Relation { get; set; }
+
+        /// <summary>
         /// 教育经历
         /// </summary>
         public string Educations { get; set; }

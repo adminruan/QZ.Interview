@@ -260,12 +260,51 @@ namespace QZ.Interview.Api.Bases
                 {
                     pairs.Add(name, ProcessingObject(item.GetValue(t)));
                 }
+                else if (item.PropertyType.Name == "List`1")
+                {
+                    object itemValues = item.GetValue(t);
+                    if (itemValues is List<QZ.Model.Expand.Interview_UserEducation>)
+                    {
+                        var testModel = itemValues as List<dynamic>;
+                        var testModel2 = itemValues as List<object>;
+                        pairs.Add(name, ProcessingList((List<QZ.Model.Expand.Interview_UserEducation>)itemValues));
+                    }
+                    else if (itemValues is List<QZ.Model.Expand.Interview_UserHistoryJob>)
+                    {
+                        pairs.Add(name, ProcessingList((List<QZ.Model.Expand.Interview_UserHistoryJob>)itemValues));
+                    }
+                    else if (itemValues is List<QZ.Model.Expand.Interview.Interview_InterviewerRemark>)
+                    {
+                        pairs.Add(name, ProcessingList((List<QZ.Model.Expand.Interview.Interview_InterviewerRemark>)itemValues));
+                    }
+                }
                 else
                 {
                     pairs.Add(name, QZ_Helper_Encryption.Base64Encode(item.GetValue(t).ToString()));
                 }
             }
             return pairs;
+        }
+
+        private List<Dictionary<string, string>> ProcessingList<T>(List<T> list) where T : class
+        {
+            List<Dictionary<string, string>> listPairs = new List<Dictionary<string, string>>();
+            foreach (var item in list)
+            {
+                Type type = item.GetType();
+                PropertyInfo[] properties = type.GetProperties();
+                Dictionary<string, string> valuePairs = new Dictionary<string, string>();
+                foreach (var property in properties)
+                {
+                    KeyValuePair<string, string> keyValue = PropertyDispose(property, item);
+                    if (!keyValue.Equals(default(KeyValuePair<string, string>)))
+                    {
+                        valuePairs.Add(keyValue.Key, keyValue.Value);
+                    }
+                }
+                listPairs.Add(valuePairs);
+            }
+            return listPairs;
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using QZ.Interface.Interview_IService;
 using QZ.Model.DBContext;
 using QZ.Model.Expand;
+using QZ.Model.Expand.Interview;
 using QZ.Model.Interview;
 using System;
 using System.Collections.Generic;
@@ -107,6 +108,57 @@ namespace QZ.Service.Interview_Service
                 basicInfo = null;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 更新用户基本信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool UpdateBasicInfo(Interview_UserBasicInfoNew model)
+        {
+            QZ_Model_In_UserBasicInfo basicInfo = _UserBasicInfos.Find(model.ID);
+            if (basicInfo == null)
+            {
+                return false;
+            }
+            basicInfo.RealName = model.RealName;
+            basicInfo.Gender = model.Gender;
+            basicInfo.Nation = model.Nation;
+            basicInfo.Education = model.Education;
+            basicInfo.IdentityNumber = model.IdentityNumber;
+            basicInfo.BirthDate = model.BirthDate;
+            basicInfo.Age = model.Age;
+            basicInfo.Marriage = model.Marriage;
+            basicInfo.NativePlace = model.NativePlace;
+            basicInfo.Farmer = model.Farmer;
+            basicInfo.Moblie = model.Moblie;
+            basicInfo.WechatID = model.WechatID;
+            basicInfo.EmergencyContact = model.EmergencyContact;
+            basicInfo.EmergencyMobile = model.EmergencyMobile;
+            basicInfo.Relation = model.Relation;
+            base.Update(basicInfo);
+            return true;
+        }
+
+        /// <summary>
+        /// 更新用户职位及薪资
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool UpdateUserApplyJobs(Interview_UserApplyJobs model)
+        {
+            QZ_Model_In_UserBasicInfo basicInfo = new QZ_Model_In_UserBasicInfo() { ID = model.ID };
+            basicInfo.ApplyJob = model.ApplyJob;
+            basicInfo.ExpectSalary = model.ExpectSalary;
+            basicInfo.LowSalary = model.LowSalary;
+            basicInfo.ArriveTime = model.ArriveTime;
+            base._DbContext.Attach(basicInfo);
+            base._DbContext.Entry(basicInfo).Property(p => p.ApplyJob).IsModified = true;
+            base._DbContext.Entry(basicInfo).Property(p => p.ExpectSalary).IsModified = true;
+            base._DbContext.Entry(basicInfo).Property(p => p.LowSalary).IsModified = true;
+            base._DbContext.Entry(basicInfo).Property(p => p.ArriveTime).IsModified = true;
+            return base._DbContext.SaveChanges() > 0;
         }
         #endregion
     }

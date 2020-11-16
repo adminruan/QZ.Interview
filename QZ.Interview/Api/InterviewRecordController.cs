@@ -12,13 +12,14 @@ using QZ.Common.Expand;
 using QZ.Common.Helper;
 using QZ.Interface.Interview_IService;
 using QZ.Interview.Api.Bases;
+using QZ.Model.Expand;
 using QZ.Model.Expand.Interview;
 using QZ.Model.Interview;
 
 namespace QZ.Interview.Api
 {
     [Route("api/InterviewRecord/[action]")]
-    [ApiController]
+    //[ApiController]
     public class InterviewRecordController : InterviewControllerBase
     {
 
@@ -59,6 +60,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "暂无数据");
             }
+            Expression<Func<QZ_Model_In_UserBasicInfo, bool>> awaitExpression = p => true;
             if (!Type)
             {
                 //待处理
@@ -67,19 +69,22 @@ namespace QZ.Interview.Api
                     case (int)QZ_Enum_Positions.Administrative:
                         {
                             //行政-待分配的面试
-                            data = data.Where(p => p.ExtSchedule < (int)QZ_Enum_Schedules.PendingApproval);
+                            awaitExpression = awaitExpression.And(p => p.ExtSchedule < (int)QZ_Enum_Schedules.PendingApproval);
+                            data = data.Where(awaitExpression);
                         }
                         break;
                     case (int)QZ_Enum_Positions.Boss:
                         {
                             //总经理-可查看所有权限
-                            data = data.Where(p => p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval);
+                            awaitExpression = awaitExpression.And(p => p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval);
+                            data = data.Where(awaitExpression);
                         }
                         break;
                     default:
                         {
                             //其它角色-我负责的待处理面试
-                            data = data.Where(p => p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|"));
+                            awaitExpression = awaitExpression.And(p => p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|"));
+                            data = data.Where(awaitExpression);
                         }
                         break;
                 }
@@ -101,12 +106,111 @@ namespace QZ.Interview.Api
             List<QZ_Model_In_UserBasicInfo> list = data.Skip((Page - 1) * Limit).Take(Limit).ToList();
             int totalPage = data.Count().CalculateTotalPageNumber(20);
             Dictionary<string, string> pairs = new Dictionary<string, string>();
+            //我的待处理数量、已处理数量
+            pairs.Add("pendings", _iInterviewRecordsService.GetDataInterview().Where(awaitExpression).Count().ToString());
+            pairs.Add("prosesseds", _iInterviewRecordsService.GetDataInterview().Where(p => p.ExtAdminIds.Contains(adminInfo.AdminID.ToString()) && p.ExtSchedule > (int)QZ_Enum_Schedules.PendingApproval).Count().ToString());
             pairs.Add("page", Page.ToString());
             pairs.Add("limit", "20");
             pairs.Add("totalPages", totalPage.ToString());
 
-            return base.Writes(list, appoints: "RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
+            return base.Writes(list, appoints: "ID|RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
         }
+        #endregion
+
+        #region 管理员查看简历详情
+        /// <summary>
+        /// 管理员查看简历详情
+        /// </summary>
+        /// <param name="AdminID">管理员ID</param>
+        /// <param name="AdminToken">管理员令牌</param>
+        /// <param name="InterviewID">面试记录ID</param>
+        /// <returns></returns>
+        public JsonResult GetResumeByInterviewID(int AdminID, string AdminToken, int InterviewID)
+        {
+            if (!base.ValidAdminUser(AdminID, AdminToken, out QZ_Model_In_AdminInfo adminInfo))
+            {
+                return base.Write(EnumResponseCode.NotSignIn, "未登录");
+            }
+            if (InterviewID < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            QZ_Model_In_InterviewRecords interviewInfo = _iInterviewRecordsService.Find<QZ_Model_In_InterviewRecords>(InterviewID);
+            if (interviewInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "未找到面试记录");
+            }
+            QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.GetBasicInfo(interviewInfo.UserID);
+            if (basicInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "未找到用户信息");
+            }
+            if (!string.IsNullOrWhiteSpace(basicInfo.Educations))
+            {
+                basicInfo.ExtEducations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(basicInfo.Educations);
+            }
+            if (!string.IsNullOrWhiteSpace(basicInfo.Jobs))
+            {
+                basicInfo.ExtJobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(basicInfo.Jobs);
+            }
+            if (!string.IsNullOrEmpty(interviewInfo.Remarks))
+            {
+                basicInfo.ExtRemarkList = JsonConvert.DeserializeObject<List<Interview_InterviewerRemark>>(interviewInfo.Remarks);
+            }
+            basicInfo.ExtSchedule = interviewInfo.Schedule;
+            basicInfo.ExtInterviewID = interviewInfo.ID;
+            return base.Write(basicInfo, "Educations|Jobs|ExtInterviewDate|ExtScheduleText|ExtAdminIds|ExtRemarks|ExtHistoryInterviews|ExtResumeSource|ExtArriveTime|ExtApplyJob|ExtFirstDate|ExtSecondDate|extRemarks", false);
+        }
+        #endregion
+
+        #region 变更用户信息相关功能
+        
+        #region 更改用户基本信息
+        public JsonResult AlterUserBasicInfo(Interview_UserBasicInfoNew model)
+        {
+            if (model == null || model.ID < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            if (!QZ_Helper_RegularRegex.CheckPhoneNumber(model.Moblie))
+            {
+                return base.Write(EnumResponseCode.Error, "联系方式有误");
+            }
+            if (!QZ_Helper_RegularRegex.CheckPhoneNumber(model.EmergencyMobile))
+            {
+                return base.Write(EnumResponseCode.Error, "紧急联系方式有误");
+            }
+            if (!_iUserBasicInfoService.Any<QZ_Model_In_UserBasicInfo>(p => p.ID == model.ID))
+            {
+                return base.Write(EnumResponseCode.Error, "用户信息不存在");
+            }
+            if (!_iUserBasicInfoService.UpdateBasicInfo(model))
+            {
+                return base.Write(EnumResponseCode.Error, "保存失败");
+            }
+            return base.Write(EnumResponseCode.Success, "成功");
+        }
+        #endregion
+
+        #region 更改用户岗位及薪资要求
+        public JsonResult AlterUserApplyJobs(Interview_UserApplyJobs model)
+        {
+            if (model == null || model.ApplyJob < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            if (!_iUserBasicInfoService.Any<QZ_Model_In_UserBasicInfo>(p => p.ID == model.ID))
+            {
+                return base.Write(EnumResponseCode.Error, "用户信息不存在");
+            }
+            if (!_iUserBasicInfoService.UpdateUserApplyJobs(model))
+            {
+                return base.Write(EnumResponseCode.Error, "保存失败");
+            }
+            return base.Write(EnumResponseCode.Success, "成功");
+        }
+        #endregion
+
         #endregion
 
         #region 获取职位
