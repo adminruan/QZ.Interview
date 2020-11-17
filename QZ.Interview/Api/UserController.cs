@@ -261,17 +261,21 @@ namespace QZ.Interview.Api
                 return base.Write(EnumResponseCode.Error, "AccessToken 获取异常");
             }
             //获取生成二维码票据
-            string ticket = QZ_Helper_Wechat.GetQRCodeTicket(accessToken, UserID.ToString());
-            if (string.IsNullOrWhiteSpace(ticket))
+            try
             {
-                return base.Write(EnumResponseCode.Error, "Ticket 获取异常");
+                string ticket = QZ_Helper_Wechat.GetQRCodeTicket(accessToken, UserID.ToString());
+                if (string.IsNullOrWhiteSpace(ticket))
+                {
+                    return base.Write(EnumResponseCode.Error, "Ticket 获取异常");
+                }
+                //获取二维码的地址，该请求返回为图片文件
+                string qrCodeUrl = $"https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket={Uri.EscapeDataString(ticket)}";
+                return base.Write(EnumResponseCode.Success, "成功", new Dictionary<string, string>() { { "qrCodeUrl", qrCodeUrl } });
             }
-            string qrCodeUrl = QZ_Helper_Wechat.GetQRCodeByTicket(ticket);
-            if (string.IsNullOrWhiteSpace(ticket))
+            catch (Exception e)
             {
-                return base.Write(EnumResponseCode.Error, "二维码获取失败");
+                return base.Write(EnumResponseCode.Error, "位置异常", new Dictionary<string, string>() { { "errMsg", e.Message } });
             }
-            return base.Write(EnumResponseCode.Success, "成功", new Dictionary<string, string>() { { "qrCodeUrl", qrCodeUrl } });
         }
         #endregion
     }

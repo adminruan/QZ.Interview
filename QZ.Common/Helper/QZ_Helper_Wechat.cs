@@ -54,9 +54,8 @@ namespace QZ.Common
                     WeChat_Model_AccessToken accessTokenInfo = new WeChat_Model_AccessToken();
                     accessTokenInfo = JsonConvert.DeserializeObject<WeChat_Model_AccessToken>(responseStr);
                     accessToken = accessTokenInfo.AccessToken;
-                    if (string.IsNullOrWhiteSpace(accessToken))
+                    if (!string.IsNullOrWhiteSpace(accessToken))
                     {
-                        accessToken = responseStr;
                         return true;
                     }
                 }
@@ -193,19 +192,6 @@ namespace QZ.Common
             }
             JObject json = JsonConvert.DeserializeObject<JObject>(responseStr);
             return json.Value<string>("ticket");
-        }
-        #endregion
-
-        #region 通过票据获取二维码
-        /// <summary>
-        /// 通过票据获取二维码
-        /// </summary>
-        /// <param name="ticket">票据</param>
-        /// <returns></returns>
-        public static string GetQRCodeByTicket(string ticket)
-        {
-            string path = $"{_URLMP}cgi-bin/showqrcode?ticket={Uri.EscapeDataString(ticket)}";
-            return QZ_Helper_HttpMethods.HttpGet(path);
         }
         #endregion
     }
