@@ -9,7 +9,14 @@ namespace QZ.Common
 {
     public static class QZ_Helper_Wechat
     {
+        /// <summary>
+        /// https://api.weixin.qq.com/
+        /// </summary>
         private readonly static string _URL = "https://api.weixin.qq.com/";
+        /// <summary>
+        /// https://mp.weixin.qq.com/
+        /// </summary>
+        private readonly static string _URLMP = "https://mp.weixin.qq.com/";
 
         #region 获取 SessionKey
         /// <summary>
@@ -31,9 +38,9 @@ namespace QZ.Common
         /// <summary>
         /// 获取微信全局唯一接口调用凭据
         /// </summary>
-        /// <param name="appID">唯一凭证</param>
-        /// <param name="appSerect">凭证密钥</param>
-        /// <param name="accessToken">用户令牌</param>
+        /// <param name="appID">appID（默认使用题多多合伙人）</param>
+        /// <param name="appSerect">凭证密钥（默认使用题多多合伙人）</param>
+        /// <param name="accessToken">唯一凭证</param>
         /// <returns></returns>
         public static bool GetAccessToken(out string accessToken, string appID = "wx0d13958f771fb415", string appSerect = "b4a9317fc2f33f915a4f154e68e6050b")
         {
@@ -160,6 +167,45 @@ namespace QZ.Common
                     break;
             }
             return JsonConvert.SerializeObject(parameter);
+        }
+        #endregion
+
+        #region 获取生成二维码票据
+        /// <summary>
+        /// 获取生成二维码票据
+        /// </summary>
+        /// <param name="accessToken">AccessToken</param>
+        /// <param name="attach">附带数据</param>
+        /// <param name="timeOut">二维码有效时间，以秒为单位。 最大不超过2592000（即30天）</param>
+        /// <returns></returns>
+        public static string GetQRCodeTicket(string accessToken, string attach, int timeOut = 180)
+        {
+            string path = $"{_URL}cgi-bin/qrcode/create?access_token={accessToken}";
+            string parameters = $"{{\"expire_seconds\": {timeOut}, \"action_name\": \"QR_STR_SCENE\", \"action_info\": {{\"scene\": {{\"scene_str\": \"{attach}\"}}}}}}";
+            string responseStr = QZ_Helper_HttpMethods.HttpPost(path, parameters);
+            if (string.IsNullOrWhiteSpace(responseStr))
+            {
+                return string.Empty;
+            }
+            if (!responseStr.Contains("ticket"))
+            {
+                throw new Exception(responseStr);
+            }
+            JObject json = JsonConvert.DeserializeObject<JObject>(responseStr);
+            return json.Value<string>("ticket");
+        }
+        #endregion
+
+        #region 通过票据获取二维码
+        /// <summary>
+        /// 通过票据获取二维码
+        /// </summary>
+        /// <param name="ticket">票据</param>
+        /// <returns></returns>
+        public static string GetQRCodeByTicket(string ticket)
+        {
+            string path = $"{_URLMP}cgi-bin/showqrcode?ticket={Uri.EscapeDataString(ticket)}";
+            return QZ_Helper_HttpMethods.HttpGet(path);
         }
         #endregion
     }

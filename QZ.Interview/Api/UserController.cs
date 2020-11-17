@@ -247,5 +247,32 @@ namespace QZ.Interview.Api
             return base.Write(EnumResponseCode.Success, "提交成功");
         }
         #endregion
+
+        #region 用户开通面试进度提醒二维码
+        public JsonResult SchduleQRCode(int UserID, string UserToken)
+        {
+            if (!base.ValidUser(UserID, UserToken, out QZ_Model_In_User userInfo))
+            {
+                return base.Write(EnumResponseCode.NotSignIn);
+            }
+            //使用题多多合伙人appid和appsecret
+            if (!QZ_Helper_Wechat.GetAccessToken(out string accessToken, "wx0d13958f771fb415", "b4a9317fc2f33f915a4f154e68e6050b"))
+            {
+                return base.Write(EnumResponseCode.Error, "AccessToken 获取异常");
+            }
+            //获取生成二维码票据
+            string ticket = QZ_Helper_Wechat.GetQRCodeTicket(accessToken, UserID.ToString());
+            if (string.IsNullOrWhiteSpace(ticket))
+            {
+                return base.Write(EnumResponseCode.Error, "Ticket 获取异常");
+            }
+            string qrCodeUrl = QZ_Helper_Wechat.GetQRCodeByTicket(ticket);
+            if (string.IsNullOrWhiteSpace(ticket))
+            {
+                return base.Write(EnumResponseCode.Error, "二维码获取失败");
+            }
+            return base.Write(EnumResponseCode.Success, "成功", new Dictionary<string, string>() { { "qrCodeUrl", qrCodeUrl } });
+        }
+        #endregion
     }
 }
