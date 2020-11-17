@@ -147,7 +147,7 @@ namespace QZ.Interview.Api
             }
             if (!string.IsNullOrWhiteSpace(basicInfo.Educations))
             {
-                basicInfo.ExtEducations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(basicInfo.Educations);
+                basicInfo.ExtEducations = JsonConvert.DeserializeObject<List<QZ.Model.Expand.Interview_UserEducation>>(basicInfo.Educations);
             }
             if (!string.IsNullOrWhiteSpace(basicInfo.Jobs))
             {
@@ -164,7 +164,7 @@ namespace QZ.Interview.Api
         #endregion
 
         #region 变更用户信息相关功能
-        
+
         #region 更改用户基本信息
         public JsonResult AlterUserBasicInfo(Interview_UserBasicInfoNew model)
         {
@@ -211,9 +211,51 @@ namespace QZ.Interview.Api
         }
         #endregion
 
+        #region 更改用户教育经历
+        [NotSignVerify]
+        [HttpPost]
+        public JsonResult AlterEducations([FromBody]Interview_UserEducationsNew models)
+        {
+            if (models == null || models.ID < 1 || models.Educations == null || models.Educations.Count < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            if (!_iUserBasicInfoService.Any<QZ_Model_In_UserBasicInfo>(p => p.ID == models.ID))
+            {
+                return base.Write(EnumResponseCode.Error, "用户信息不存在");
+            }
+            if (!_iUserBasicInfoService.UpdateUserEduactions(models))
+            {
+                return base.Write(EnumResponseCode.Error, "保存失败");
+            }
+            return base.Write(EnumResponseCode.Success, "成功");
+        }
         #endregion
 
-        #region 获取职位
+        #region 更改用户工作经历
+        [NotSignVerify]
+        [HttpPost]
+        public JsonResult AlterUserPastJobs([FromBody]Interview_UserPastJobs models)
+        {
+            if (models == null || models.ID < 1 || models.UserPastJobs == null || models.UserPastJobs.Count < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            if (!_iUserBasicInfoService.Any<QZ_Model_In_UserBasicInfo>(p => p.ID == models.ID))
+            {
+                return base.Write(EnumResponseCode.Error, "用户信息不存在");
+            }
+            if (!_iUserBasicInfoService.UpdateUserPastJobs(models))
+            {
+                return base.Write(EnumResponseCode.Error, "保存失败");
+            }
+            return base.Write(EnumResponseCode.Success, "成功");
+        }
+        #endregion
+
+        #endregion
+
+        #region 职位信息
         public JsonResult GetPositions()
         {
             List<QZ_Model_In_Positions> positions = _iPositionsService.GetPositions();
@@ -237,6 +279,14 @@ namespace QZ.Interview.Api
         {
             Dictionary<string, int> pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_RecruitPlatform));
             return base.Writes(pairs.Select(p => new { value = p.Value, name = p.Key }).ToList());
+        }
+        #endregion
+
+        #region 教育类型
+        public JsonResult EducationTeyps()
+        {
+            Dictionary<string, int> pairs = QZ_Helper_EnumHelper.ToPairs(typeof(QZ_Enum_EducationTypes));
+            return base.Writes(pairs.Select(p => new { name = p.Key }).ToList());
         }
         #endregion
 

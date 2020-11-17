@@ -40,6 +40,20 @@ namespace QZ.Interface.Interview_IService
         /// <param name="model"></param>
         /// <returns></returns>
         bool UpdateUserApplyJobs(Interview_UserApplyJobs model);
+
+        /// <summary>
+        /// 更新用户教育经历
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        bool UpdateUserEduactions(Interview_UserEducationsNew model);
+
+        /// <summary>
+        /// 更新用工作经历
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        bool UpdateUserPastJobs(Interview_UserPastJobs model);
         #endregion
     }
 }

@@ -162,7 +162,7 @@ namespace QZ.Model.Interview
         /// 教育经历
         /// </summary>
         [NotMapped]
-        public List<Interview_UserEducation> ExtEducations { get; set; }
+        public List<QZ.Model.Expand.Interview_UserEducation> ExtEducations { get; set; }
 
         /// <summary>
         /// 工作经历

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using QZ.Interface.Interview_IService;
 using QZ.Model.DBContext;
 using QZ.Model.Expand;
@@ -158,6 +159,34 @@ namespace QZ.Service.Interview_Service
             base._DbContext.Entry(basicInfo).Property(p => p.ExpectSalary).IsModified = true;
             base._DbContext.Entry(basicInfo).Property(p => p.LowSalary).IsModified = true;
             base._DbContext.Entry(basicInfo).Property(p => p.ArriveTime).IsModified = true;
+            return base._DbContext.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 更新用户教育经历
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool UpdateUserEduactions(Interview_UserEducationsNew model)
+        {
+            QZ_Model_In_UserBasicInfo basicInfo = new QZ_Model_In_UserBasicInfo() { ID = model.ID };
+            basicInfo.Educations = JsonConvert.SerializeObject(model.Educations);
+            base._DbContext.Attach(basicInfo);
+            base._DbContext.Entry(basicInfo).Property(p => p.Educations).IsModified = true;
+            return base._DbContext.SaveChanges() > 0;
+        }
+
+        /// <summary>
+        /// 更新用工作经历
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool UpdateUserPastJobs(Interview_UserPastJobs model)
+        {
+            QZ_Model_In_UserBasicInfo basicInfo = new QZ_Model_In_UserBasicInfo() { ID = model.ID };
+            basicInfo.Jobs = JsonConvert.SerializeObject(model.UserPastJobs);
+            base._DbContext.Attach(basicInfo);
+            base._DbContext.Entry(basicInfo).Property(p => p.Jobs).IsModified = true;
             return base._DbContext.SaveChanges() > 0;
         }
         #endregion
