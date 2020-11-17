@@ -26,7 +26,13 @@ namespace QZ.Interview.Api
             this._iAdminInfoService = iAdminInfoService;
             this._iPositionsService = iPositionsService;
         }
+        /// <summary>
+        /// 面试小程序APPID
+        /// </summary>
         private readonly static string _APPID = "";
+        /// <summary>
+        /// 面试小程序APPSECRET
+        /// </summary>
         private readonly static string _APPSECRET = "";
         private readonly object _obj = new object();
         private readonly QZ_In_IUserService _iUserService;
