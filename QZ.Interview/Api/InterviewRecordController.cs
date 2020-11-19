@@ -410,11 +410,7 @@ namespace QZ.Interview.Api
                 {
                     return base.Write(EnumResponseCode.Error, "面试已结束");
                 }
-                QZ_Model_In_AdminInfo nextAdminInfo = _iAdminInfoService.GEtUserInfoByAdminID(InterviewAdminID);
-                if (nextAdminInfo == null)
-                {
-                    return base.Write(EnumResponseCode.Error, "下轮面试官不存在");
-                }
+                QZ_Model_In_AdminInfo nextAdminInfo = null;
                 switch (Status)
                 {
                     case 301:
@@ -428,6 +424,11 @@ namespace QZ.Interview.Api
                     default:
                         //通过本轮
                         {
+                            nextAdminInfo = _iAdminInfoService.GEtUserInfoByAdminID(InterviewAdminID);
+                            if (nextAdminInfo == null)
+                            {
+                                return base.Write(EnumResponseCode.Error, "下轮面试官不存在");
+                            }
                             switch (interviewInfo.Schedule)
                             {
                                 case (int)QZ_Enum_Schedules.InterviewSencond:
@@ -477,7 +478,7 @@ namespace QZ.Interview.Api
 
 
                 //下轮面试官发送微信公众号消息提醒
-                if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+                if (Status == 303 && QZ_Helper_Wechat.GetAccessToken(out string accessToken))
                 {
                     QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == interviewInfo.UserID);
                     if (basicInfo != null)
