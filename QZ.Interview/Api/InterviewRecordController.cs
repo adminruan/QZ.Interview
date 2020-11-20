@@ -68,8 +68,8 @@ namespace QZ.Interview.Api
                 {
                     case (int)QZ_Enum_Positions.Administrative:
                         {
-                            //行政-待分配的面试
-                            awaitExpression = awaitExpression.And(p => p.ExtSchedule < (int)QZ_Enum_Schedules.PendingApproval);
+                            //行政-待分配、需要我处理的面试
+                            awaitExpression = awaitExpression.And(p => p.ExtSchedule < (int)QZ_Enum_Schedules.PendingApproval || (p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|") && p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval));
                             data = data.Where(awaitExpression);
                         }
                         break;
@@ -82,8 +82,8 @@ namespace QZ.Interview.Api
                         break;
                     default:
                         {
-                            //其它角色-我负责的待处理面试
-                            awaitExpression = awaitExpression.And(p => p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|"));
+                            //其它角色-需要我处理的面试
+                            awaitExpression = awaitExpression.And(p => p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|") && p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval);
                             data = data.Where(awaitExpression);
                         }
                         break;
