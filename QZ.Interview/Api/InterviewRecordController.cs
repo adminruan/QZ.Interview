@@ -416,10 +416,12 @@ namespace QZ.Interview.Api
                     case 301:
                         //不合适
                         interviewInfo.Schedule = (int)QZ_Enum_Schedules.Fail;
+                        interviewInfo.EndTime = DateTime.Now;
                         break;
                     case 302:
                         //备用
                         interviewInfo.Schedule = (int)QZ_Enum_Schedules.Spare;
+                        interviewInfo.EndTime = DateTime.Now;
                         break;
                     default:
                         //通过本轮
@@ -546,6 +548,8 @@ namespace QZ.Interview.Api
                 {
                     return base.Write(EnumResponseCode.Error, "面试完成");
                 }
+                interviewInfo.Schedule = (int)QZ_Enum_Schedules.Qualified;//标记通过面试
+                interviewInfo.EndTime = DateTime.Now;
                 interviewInfo.RealOffer = RealOffer;
                 interviewInfo.TryOffer = TryOffer;
                 interviewInfo.EntryTime = EntryTime;
