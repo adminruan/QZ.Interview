@@ -63,5 +63,20 @@ namespace QZ.Service.Interview_Service
             return _AdminInfos.FirstOrDefault(p => p.AdminID == adminID);
         }
         #endregion
+
+        #region 写入
+        /// <summary>
+        /// 绑定公众号中openid
+        /// </summary>
+        /// <param name="uid">管理员ID</param>
+        /// <param name="openID">在公众号中的openid</param>
+        /// <returns></returns>
+        public bool BindOfficialOpenID(int uid, string openID)
+        {
+            QZ_Model_In_AdminInfo data = new QZ_Model_In_AdminInfo() { AdminID = uid };
+            data.OpenID = openID;
+            return base.PartUpdate(data, new string[] { "OpenID" });
+        }
+        #endregion
     }
 }

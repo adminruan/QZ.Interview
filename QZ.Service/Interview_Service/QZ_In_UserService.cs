@@ -13,9 +13,11 @@ namespace QZ.Service.Interview_Service
     public class QZ_In_UserService : BaseService, QZ_In_IUserService
     {
         private readonly DbSet<QZ_Model_In_User> _Users;
+        private readonly Interview_DB_EFContext _DB_EFContext;
         public QZ_In_UserService(Interview_DB_EFContext dbContext) : base(dbContext)
         {
             this._Users = dbContext.Users;
+            this._DB_EFContext = dbContext;
         }
 
         #region 读取
@@ -47,6 +49,24 @@ namespace QZ.Service.Interview_Service
         public QZ_Model_In_User GetUserByOpenID(string openID)
         {
             return _Users.FirstOrDefault(p => p.OpenID == openID);
+        }
+        #endregion
+
+        #region 写入
+        /// <summary>
+        /// 绑定接受消息通知公众号OpenID
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="offOpenID"></param>
+        /// <returns></returns>
+        public bool BindOfficialOpenID(int uid, string offOpenID)
+        {
+            QZ_Model_In_User data = new QZ_Model_In_User() { UserID = uid };
+            data.OfficalOpenID = offOpenID;
+            return base.PartUpdate(data, new[] { "OfficalOpenID" });
+            //var entity = _DB_EFContext.Attach(data);
+            //entity.Property(p => p.OfficalOpenID).IsModified = true;
+            //return _DB_EFContext.SaveChanges() > 0;
         }
         #endregion
     }

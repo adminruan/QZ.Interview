@@ -35,5 +35,15 @@ namespace QZ.Interface.Interview_IService
         /// <returns></returns>
         QZ_Model_In_AdminInfo GEtUserInfoByAdminID(int adminID);
         #endregion
+
+        #region 写入
+        /// <summary>
+        /// 绑定公众号中openid
+        /// </summary>
+        /// <param name="uid">管理员ID</param>
+        /// <param name="openID">在公众号中的openid</param>
+        /// <returns></returns>
+        bool BindOfficialOpenID(int uid, string openID);
+        #endregion
     }
 }

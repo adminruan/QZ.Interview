@@ -71,5 +71,31 @@ namespace QZ.Interview.Api
             }
         }
         #endregion
+
+        #region 绑定公众号OpenID
+        /// <summary>
+        /// 绑定公众号OpenID
+        /// </summary>
+        /// <param name="AdminID">管理员ID</param>
+        /// <param name="OffOpenID">公众号openid</param>
+        /// <returns></returns>
+        public JsonResult BindOfficialOpenID(int AdminID, string OffOpenID)
+        {
+            if (AdminID < 1 || string.IsNullOrWhiteSpace(OffOpenID))
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            var adminInfo = _iAdminInfoService.Find<QZ_Model_In_AdminInfo>(AdminID);
+            if (adminInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "未找到管理员信息");
+            }
+            if (!_iAdminInfoService.BindOfficialOpenID(AdminID, OffOpenID))
+            {
+                return base.Write(EnumResponseCode.Error, "开通消息提醒失败，请重试");
+            }
+            return base.Write(EnumResponseCode.Success, "开通成功");
+        }
+        #endregion
     }
 }

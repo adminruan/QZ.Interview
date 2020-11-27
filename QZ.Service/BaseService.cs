@@ -305,7 +305,7 @@ namespace QZ.Service
             this._DbContext.Entry<T>(t).State = EntityState.Modified;
             this.Commit();//保存 然后重置为UnChanged
         }
-      
+
 
         public void Update<T>(IEnumerable<T> tList) where T : class
         {
@@ -475,6 +475,23 @@ namespace QZ.Service
             reader.Close();
             conn.Close();
             return oDataTable;
+        }
+
+        /// <summary>
+        /// 指定字段更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity">实体</param>
+        /// <param name="properties">需要更新的字段</param>
+        /// <returns></returns>
+        public bool PartUpdate<T>(T entity, string[] properties) where T : class
+        {
+            var thisEntity = _DbContext.Attach(entity);
+            foreach (var p in properties)
+            {
+                thisEntity.Property(p).IsModified = true;
+            }
+            return _DbContext.SaveChanges() > 0;
         }
 
 

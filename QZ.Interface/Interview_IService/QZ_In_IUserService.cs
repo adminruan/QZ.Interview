@@ -29,5 +29,15 @@ namespace QZ.Interface.Interview_IService
         /// <returns></returns>
         QZ_Model_In_User GetUserByOpenID(string openID);
         #endregion
+
+        #region 写入
+        /// <summary>
+        /// 绑定接受消息通知公众号OpenID
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <param name="offOpenID"></param>
+        /// <returns></returns>
+        bool BindOfficialOpenID(int uid, string offOpenID);
+        #endregion
     }
 }

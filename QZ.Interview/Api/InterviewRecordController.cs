@@ -166,6 +166,7 @@ namespace QZ.Interview.Api
         #region 变更用户信息相关功能
 
         #region 更改用户基本信息
+        [NotSignVerify]
         public JsonResult AlterUserBasicInfo(Interview_UserBasicInfoNew model)
         {
             if (model == null || model.ID < 1)

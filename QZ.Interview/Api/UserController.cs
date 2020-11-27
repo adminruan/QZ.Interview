@@ -284,5 +284,31 @@ namespace QZ.Interview.Api
             }
         }
         #endregion
+
+        #region 绑定用户在中公众号OpenID
+        /// <summary>
+        /// 绑定用户在中公众号OpenID
+        /// </summary>
+        /// <param name="OffOpenID">公众号openid</param>
+        /// <param name="UID">小程序中对应用户ID</param>
+        /// <returns></returns>
+        public JsonResult BindOfficialAccountOpenID(string OffOpenID, int UID)
+        {
+            if (string.IsNullOrWhiteSpace(OffOpenID) || UID < 1)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            QZ_Model_In_User userInfo = _iUserService.Find<QZ_Model_In_User>(UID);
+            if (userInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "未找到用户信息");
+            }
+            if (!_iUserService.BindOfficialOpenID(UID, OffOpenID))
+            {
+                return base.Write(EnumResponseCode.Error, "开通消息提醒失败，请重试扫码开通");
+            }
+            return base.Write(EnumResponseCode.Success, "开通成功");
+        }
+        #endregion
     }
 }

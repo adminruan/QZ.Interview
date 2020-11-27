@@ -178,6 +178,15 @@ namespace QZ.Interface
         List<T> ExcuteStoredProcedure<T>(string sql, bool isRead = true) where T : class, new();
 
         DataTable SqlQueryForDataTatable(string sql, bool isRead = true);
+
+        /// <summary>
+        /// 指定字段更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity">实体</param>
+        /// <param name="properties">需要更新的字段</param>
+        /// <returns></returns>
+        bool PartUpdate<T>(T entity, string[] properties) where T : class;
     }
 
     public class PageResult<T>

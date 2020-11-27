@@ -77,5 +77,10 @@ namespace QZ.Model.Interview
         /// 注册时间
         /// </summary>
         public DateTime AddTime { get; set; }
+
+        /// <summary>
+        /// 用户在公众号中OpenID
+        /// </summary>
+        public string OfficalOpenID { get; set; }
     }
 }
