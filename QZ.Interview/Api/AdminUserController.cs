@@ -86,8 +86,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "请求参数有误");
             }
-            var adminInfo = _iAdminInfoService.Find<QZ_Model_In_AdminInfo>(AdminID);
-            if (adminInfo == null)
+            if (!_iAdminInfoService.Any<QZ_Model_In_AdminInfo>(p => p.AdminID == AdminID))
             {
                 return base.Write(EnumResponseCode.Error, "未找到管理员信息");
             }

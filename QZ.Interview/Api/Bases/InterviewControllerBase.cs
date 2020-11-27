@@ -78,7 +78,7 @@ namespace QZ.Interview.Api.Bases
         {
             Dictionary<string, object> pairs = new Dictionary<string, object>();
             pairs.Add("SIP", QZ_Helper_Encryption.Base64Encode(QZ_Helper_IP.GetServiceIP()));
-            pairs.Add("Date", QZ_Helper_Encryption.Base64Encode(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+            pairs.Add("Date", QZ_Helper_Encryption.Base64Encode(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")));
             pairs.Add("S", QZ_Helper_Encryption.Base64Encode(((int)code).ToString()));
             if (string.IsNullOrWhiteSpace(message))
                 message = code.GetEnumDescription();

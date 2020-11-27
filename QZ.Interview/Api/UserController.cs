@@ -299,8 +299,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "请求参数有误");
             }
-            QZ_Model_In_User userInfo = _iUserService.Find<QZ_Model_In_User>(UID);
-            if (userInfo == null)
+            if (!_iUserService.Any<QZ_Model_In_User>(p => p.UserID == UID))
             {
                 return base.Write(EnumResponseCode.Error, "未找到用户信息");
             }
