@@ -79,6 +79,7 @@ namespace QZ.Interview.Api
         /// <param name="AdminID">管理员ID</param>
         /// <param name="OffOpenID">公众号openid</param>
         /// <returns></returns>
+        [NotSignVerify]
         public JsonResult BindOfficialOpenID(int AdminID, string OffOpenID)
         {
             if (AdminID < 1 || string.IsNullOrWhiteSpace(OffOpenID))

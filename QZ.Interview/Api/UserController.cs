@@ -292,6 +292,7 @@ namespace QZ.Interview.Api
         /// <param name="OffOpenID">公众号openid</param>
         /// <param name="UID">小程序中对应用户ID</param>
         /// <returns></returns>
+        [NotSignVerify]
         public JsonResult BindOfficialAccountOpenID(string OffOpenID, int UID)
         {
             if (string.IsNullOrWhiteSpace(OffOpenID) || UID < 1)
