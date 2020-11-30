@@ -104,6 +104,15 @@ namespace QZ.Interview.Api
                 return base.Write(EnumResponseCode.Error, "暂无数据");
             }
             List<QZ_Model_In_UserBasicInfo> list = data.Skip((Page - 1) * Limit).Take(Limit).ToList();
+            //获取面试人历史记录
+            List<int> userIds = list.Select(p => p.UserID).GroupBy(p => p).Select(p => p.Key).ToList();
+            List<(int, int)> interviewTimes = _iInterviewRecordsService.GetInterviewTimesByUIDS(userIds);
+            list.ForEach(x =>
+            {
+                int items = interviewTimes.FirstOrDefault(p => p.Item1 == x.UserID).Item2;
+                x.ExtInterviewTimes = items == 0 ? 0 : items - 1;
+            });
+
             int totalPage = data.Count().CalculateTotalPageNumber(20);
             Dictionary<string, string> pairs = new Dictionary<string, string>();
             //我的待处理数量、已处理数量
@@ -113,7 +122,7 @@ namespace QZ.Interview.Api
             pairs.Add("limit", "20");
             pairs.Add("totalPages", totalPage.ToString());
 
-            return base.Writes(list, appoints: "ID|RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds", data: pairs);
+            return base.Writes(list, appoints: "ID|RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|ExtAdminIds|ExtInterviewTimes", data: pairs);
         }
         #endregion
 
@@ -160,6 +169,42 @@ namespace QZ.Interview.Api
             basicInfo.ExtSchedule = interviewInfo.Schedule;
             basicInfo.ExtInterviewID = interviewInfo.ID;
             return base.Write(basicInfo, "Educations|Jobs|ExtInterviewDate|ExtScheduleText|ExtAdminIds|ExtRemarks|ExtHistoryInterviews|ExtResumeSource|ExtArriveTime|ExtApplyJob|ExtFirstDate|ExtSecondDate|extRemarks", false);
+        }
+        #endregion
+
+        #region 获取历史面试记录
+        public JsonResult HistoryInterviews(int interviewID)
+        {
+            if (interviewID < 1)
+            {
+                return Write(EnumResponseCode.Error);
+            }
+            QZ_Model_In_InterviewRecords interviewInfo = _iInterviewRecordsService.Find<QZ_Model_In_InterviewRecords>(interviewID);
+            if (interviewInfo == null)
+            {
+                return Write(EnumResponseCode.Error, "未找到面试信息");
+            }
+            List<QZ_Model_In_UserBasicInfo> list = _iInterviewRecordsService.GetDataInterview().ToList().Where(p => p.UserID == interviewInfo.UserID && p.ID != interviewInfo.ID && p.ExtSchedule > (int)QZ_Enum_Schedules.PendingApproval).ToList();
+            if (list == null || list.Count == 0)
+            {
+                return Write(EnumResponseCode.Error, "无历史记录");
+            }
+            foreach (var item in list)
+            {
+                if (!string.IsNullOrWhiteSpace(item.Educations))
+                {
+                    item.ExtEducations = JsonConvert.DeserializeObject<List<QZ.Model.Expand.Interview_UserEducation>>(item.Educations);
+                }
+                if (!string.IsNullOrWhiteSpace(item.Jobs))
+                {
+                    item.ExtJobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(item.Jobs);
+                }
+                if (!string.IsNullOrEmpty(item.ExtRemarks))
+                {
+                    item.ExtRemarkList = JsonConvert.DeserializeObject<List<Interview_InterviewerRemark>>(item.ExtRemarks);
+                }
+            }
+            return Writes(list, "RealName|Gender|Age|BirthDate|Education|ApplyJob|ExtInterviewDate|ExtSchedule|ExtInterviewID|UserID|ExtEducations|ExtJobs|ExtRemarkList");
         }
         #endregion
 

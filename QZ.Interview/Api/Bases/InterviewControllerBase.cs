@@ -144,34 +144,36 @@ namespace QZ.Interview.Api.Bases
             {
                 pairs.Add("data", ProcessingDictionary(data));
             }
-            List<Dictionary<string, string>> listPairs = new List<Dictionary<string, string>>();
+            List<Dictionary<string, object>> listPairs = new List<Dictionary<string, object>>();
             foreach (var item in list)
             {
-                Type type = item.GetType();
-                PropertyInfo[] properties = type.GetProperties();
-                if (!string.IsNullOrWhiteSpace(appoints))
-                {
-                    //指定字段响应或隐藏
-                    List<string> appointList = appointList = appoints.Split("|", StringSplitOptions.RemoveEmptyEntries).ToList();
-                    if (appointRes)
-                    {
-                        properties = properties.Where(p => appointList.Contains(p.Name)).ToArray();
-                    }
-                    else
-                    {
-                        properties = properties.Where(p => !appointList.Contains(p.Name)).ToArray();
-                    }
-                }
-                Dictionary<string, string> valuePairs = new Dictionary<string, string>();
-                foreach (var property in properties)
-                {
-                    KeyValuePair<string, string> keyValue = PropertyDispose(property, item);
-                    if (!keyValue.Equals(default(KeyValuePair<string, string>)))
-                    {
-                        valuePairs.Add(keyValue.Key, keyValue.Value);
-                    }
-                }
-                listPairs.Add(valuePairs);
+                //Type type = item.GetType();
+                //PropertyInfo[] properties = type.GetProperties();
+                //if (!string.IsNullOrWhiteSpace(appoints))
+                //{
+                //    //指定字段响应或隐藏
+                //    List<string> appointList = appointList = appoints.Split("|", StringSplitOptions.RemoveEmptyEntries).ToList();
+                //    if (appointRes)
+                //    {
+                //        properties = properties.Where(p => appointList.Contains(p.Name)).ToArray();
+                //    }
+                //    else
+                //    {
+                //        properties = properties.Where(p => !appointList.Contains(p.Name)).ToArray();
+                //    }
+                //}
+                //Dictionary<string, string> valuePairs = new Dictionary<string, string>();
+                //foreach (var property in properties)
+                //{
+                //    KeyValuePair<string, string> keyValue = PropertyDispose(property, item);
+                //    if (!keyValue.Equals(default(KeyValuePair<string, string>)))
+                //    {
+                //        valuePairs.Add(keyValue.Key, keyValue.Value);
+                //    }
+                //}
+                //listPairs.Add(valuePairs);
+
+                listPairs.Add(ProcessingObject(item));
             }
             pairs.Add("datas", listPairs);
             return Json(pairs);

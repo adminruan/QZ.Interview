@@ -81,6 +81,13 @@ namespace QZ.Interface.Interview_IService
         /// </summary>
         /// <returns></returns>
         int GetThisMonthInterviewNumber();
+
+        /// <summary>
+        /// 根据用户ID统计用户面试次数
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        List<(int, int)> GetInterviewTimesByUIDS(List<int> userIds);
         #endregion
     }
 }

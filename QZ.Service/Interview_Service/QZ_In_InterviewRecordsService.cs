@@ -143,10 +143,13 @@ namespace QZ.Service.Interview_Service
                         ExtInterviewDate = i.AddTime,
                         ExtSchedule = i.Schedule,
                         ExtInterviewID = i.ID,
-                        ExtAdminIds = i.InterviewerAdminIds
+                        ExtAdminIds = i.InterviewerAdminIds,
+                        UserID = b.UserID,
+                        ExtRemarks = i.Remarks,
+                        Jobs = b.Jobs,
+                        Educations = b.Educations
                     }).OrderByDescending(p => p.ExtInterviewDate);
         }
-
 
         /// <summary>
         /// 获取面试信息
@@ -256,6 +259,16 @@ namespace QZ.Service.Interview_Service
         public int GetThisMonthInterviewNumber()
         {
             return _InterviewRecords.Where(p => p.AddTime.Month >= DateTime.Now.Month).Select(p => p.UserID).ToList().GroupBy(p => p).Count();
+        }
+
+        /// <summary>
+        /// 根据用户ID统计用户面试次数
+        /// </summary>
+        /// <param name="userIds"></param>
+        /// <returns></returns>
+        public List<(int, int)> GetInterviewTimesByUIDS(List<int> userIds)
+        {
+            return _InterviewRecords.Where(p => userIds.Contains(p.UserID)).GroupBy(p => p.UserID).Select(p => ValueTuple.Create(p.Key, p.Count())).ToList();
         }
         #endregion
     }

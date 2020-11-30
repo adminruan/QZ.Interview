@@ -247,6 +247,12 @@ namespace QZ.Model.Interview
         /// </summary>
         [NotMapped]
         public DateTime? ExtSecondDate { get; set; }
+
+        /// <summary>
+        /// 面试次数
+        /// </summary>
+        [NotMapped]
+        public int ExtInterviewTimes { get; set; }
         #endregion
     }
 }
