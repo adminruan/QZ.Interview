@@ -168,6 +168,12 @@ namespace QZ.Interview.Api
             }
             basicInfo.ExtSchedule = interviewInfo.Schedule;
             basicInfo.ExtInterviewID = interviewInfo.ID;
+            if (interviewInfo.Schedule == (int)QZ_Enum_Schedules.Qualified)
+            {
+                basicInfo.ExtRealOffer = interviewInfo.RealOffer ?? 0M;
+                basicInfo.ExtTryOffer = interviewInfo.TryOffer ?? 0M;
+                basicInfo.ExtEntryTime = interviewInfo.EntryTime;
+            }
             return base.Write(basicInfo, "Educations|Jobs|ExtInterviewDate|ExtScheduleText|ExtAdminIds|ExtRemarks|ExtHistoryInterviews|ExtResumeSource|ExtArriveTime|ExtApplyJob|ExtFirstDate|ExtSecondDate|extRemarks", false);
         }
         #endregion

@@ -253,6 +253,24 @@ namespace QZ.Model.Interview
         /// </summary>
         [NotMapped]
         public int ExtInterviewTimes { get; set; }
+
+        /// <summary>
+        /// 正式薪资
+        /// </summary>
+        [NotMapped]
+        public decimal ExtRealOffer { get; set; }
+
+        /// <summary>
+        /// 试用薪资
+        /// </summary>
+        [NotMapped]
+        public decimal ExtTryOffer { get; set; }
+
+        /// <summary>
+        /// 入职时间
+        /// </summary>
+        [NotMapped]
+        public DateTime? ExtEntryTime { get; set; }
         #endregion
     }
 }
