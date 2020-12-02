@@ -390,7 +390,7 @@ namespace QZ.Interview.Api
                 {
                     return base.Write(EnumResponseCode.Error, "记录不存在");
                 }
-                if (interviewInfo.Schedule >= (int)QZ_Enum_Schedules.Fail)
+                if (interviewInfo.Schedule >= (int)QZ_Enum_Schedules.Fail && interviewInfo.Schedule != (int)QZ_Enum_Schedules.Spare)
                 {
                     return base.Write(EnumResponseCode.Error, "面试已结束");
                 }
@@ -623,6 +623,91 @@ namespace QZ.Interview.Api
 
                 return base.Write(EnumResponseCode.Success, "审批成功");
             }
+        }
+        #endregion
+
+        #region 更改备用面试记录进度状态
+        /// <summary>
+        /// 更改备用面试记录进度状态
+        /// </summary>
+        /// <param name="AdminID">当前管理员ID</param>
+        /// <param name="AdminToken">当前管理员令牌</param>
+        /// <param name="InterviewID">面试记录</param>
+        /// <param name="Schedule">进度类型</param>
+        /// <param name="NextAdminID">下轮操作管理员</param>
+        /// <returns></returns>
+        public JsonResult AlterSpareInterview(int AdminID, string AdminToken, int InterviewID, QZ_Enum_Schedules Schedule, int NextAdminID)
+        {
+            if (!base.ValidAdminUser(AdminID, AdminToken, out QZ_Model_In_AdminInfo adminInfo))
+            {
+                return base.Write(EnumResponseCode.NotSignIn, "未登录");
+            }
+            if (InterviewID < 1 || NextAdminID < 1 || Schedule == default)
+            {
+                return base.Write(EnumResponseCode.Error, "请求参数有误");
+            }
+            QZ_Model_In_InterviewRecords interviewInfo = _iInterviewRecordsService.Find<QZ_Model_In_InterviewRecords>(InterviewID);
+            if (interviewInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "记录不存在");
+            }
+            if (interviewInfo.Schedule != (int)QZ_Enum_Schedules.Spare)
+            {
+                return base.Write(EnumResponseCode.Error, "异常操作，面试不属于备用状态");
+            }
+            QZ_Model_In_AdminInfo nextAdminInfo = _iAdminInfoService.GEtUserInfoByAdminID(NextAdminID);
+            if (nextAdminInfo == null)
+            {
+                return base.Write(EnumResponseCode.Error, "未找到下轮操作管理员");
+            }
+            switch (Schedule)
+            {
+                case QZ_Enum_Schedules.InterviewSencond:
+                    {
+                        //进入二面
+                        interviewInfo.Schedule = (int)Schedule;
+                        interviewInfo.InterviewerAdminIds += $"{NextAdminID}|";
+                    }
+                    break;
+                case QZ_Enum_Schedules.PendingApproval:
+                    {
+                        //进入入职审批
+                        interviewInfo.Schedule = (int)Schedule;
+                        interviewInfo.InterviewerAdminIds += $"{NextAdminID}|";
+                    }
+                    break;
+                default:
+                    return base.Write(EnumResponseCode.Error, "面试进度有误");
+            }
+            //下轮面试官发送微信公众号消息提醒
+            if (QZ_Helper_Wechat.GetAccessToken(out string accessToken))
+            {
+                QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.FirstOrDefault<QZ_Model_In_UserBasicInfo>(p => p.UserID == interviewInfo.UserID);
+                if (basicInfo != null)
+                {
+                    string path = "";
+                    Dictionary<string, string> pairs = new Dictionary<string, string>();
+                    if (interviewInfo.Schedule == (int)QZ_Enum_Schedules.PendingApproval)
+                    {
+                        pairs.Add("first", $"您好！应聘“{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}”职位的候选人已通过前两轮面试，请您尽快批准。");
+                    }
+                    else
+                    {
+                        pairs.Add("first", $"您好！应聘“{_iPositionsService.GetInfoByID(interviewInfo.ApplyJob)?.PositionName ?? "-"}”职位的候选人已到达，请您尽快前往会议室面试。");
+                        path = "/pages/manager/pages/handleInfo/handleInfo";
+                    }
+                    pairs.Add("keyword1", $"{basicInfo.RealName} | {basicInfo.Gender} | {basicInfo.Age} | {basicInfo.Education}");
+                    pairs.Add("keyword2", $"-");
+                    pairs.Add("keyword3", $"{DateTime.Now.Date.ToString("yyyy-MM-dd")}");
+                    pairs.Add("keyword4", $"{((QZ_Enum_Schedules)interviewInfo.Schedule).GetEnumDescription()}");
+                    pairs.Add("keyword5", $"{nextAdminInfo.RealName}");
+                    pairs.Add("remark", "");
+                    QZ_Helper_Wechat.SendTemplateMessage(accessToken, QZ_Helper_Wechat.AwaitInterviewTemplate(nextAdminInfo.OpenID, pairs, QZ_Helper_Constant.PartnerAPPID, path, type: 2));
+                }
+            }
+
+            _iInterviewRecordsService.Update(interviewInfo);
+            return base.Write(EnumResponseCode.Success);
         }
         #endregion
     }
