@@ -207,7 +207,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.NotSignIn);
             }
-            if (!QZ_Helper_RegularRegex.CheckIdentity(model.IdentityNumber))
+            if (!string.IsNullOrWhiteSpace(model.IdentityNumber) && !QZ_Helper_RegularRegex.CheckIdentity(model.IdentityNumber))
             {
                 return base.Write(EnumResponseCode.Error, "请输入有效证件号~");
             }
