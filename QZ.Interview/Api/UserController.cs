@@ -252,8 +252,9 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "无可用行政信息");
             }
-            //提交面试信息
-            if (!_iInterviewRecordsService.SubmitInterviewRecord(model.UserID, admins.First().AdminID, model.ApplyJob))
+            //用户不存在还在处理中的面试，则自动给用户提交面试信息
+            if (!_iInterviewRecordsService.Any<QZ_Model_In_InterviewRecords>(p => p.UserID == model.UserID && p.Schedule <= (int)QZ_Enum_Schedules.PendingApproval)
+                && !_iInterviewRecordsService.SubmitInterviewRecord(model.UserID, admins.First().AdminID, model.ApplyJob))
             {
                 return base.Write(EnumResponseCode.Error, "面试申请提交失败");
             }
