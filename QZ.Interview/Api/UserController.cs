@@ -29,11 +29,11 @@ namespace QZ.Interview.Api
         /// <summary>
         /// 面试小程序APPID
         /// </summary>
-        private readonly static string _APPID = "";
+        private readonly static string _APPID = "wx2f1f506db7ae8667";
         /// <summary>
         /// 面试小程序APPSECRET
         /// </summary>
-        private readonly static string _APPSECRET = "";
+        private readonly static string _APPSECRET = "845e0898515eba9fb760b13398fcd5e1";
         private readonly object _obj = new object();
         private readonly QZ_In_IUserService _iUserService;
         private readonly QZ_In_IUserBasicInfoService _iUserBasicInfoService;
@@ -48,43 +48,43 @@ namespace QZ.Interview.Api
         /// <param name="EncryptedData">加密后的用户信息</param>
         /// <param name="Code">微信一次性凭证</param>
         /// <param name="IV">解密填充</param>
-        /// <param name="XID">收款账户信息ID</param>
         /// <param name="Source">来源</param>
         /// <returns></returns>
         [NotSignVerify]
-        public JsonResult MinProgramAuthority(string EncryptedData, string Code, string IV, int XID, string Source)
+        public JsonResult MinProgramAuthority(string EncryptedData, string Code, string IV, string Source)
         {
-            if (string.IsNullOrEmpty(Code) || string.IsNullOrEmpty(EncryptedData) || string.IsNullOrEmpty(IV) || XID < 1 || string.IsNullOrWhiteSpace(Source))
+            if (string.IsNullOrEmpty(Code) || string.IsNullOrEmpty(EncryptedData) || string.IsNullOrEmpty(IV) || string.IsNullOrWhiteSpace(Source))
             {
                 return base.Write(EnumResponseCode.Error, "参数有误");
             }
-            string wxJson = string.Empty;
-            wxJson = QZ_Helper_Wechat.GetAppSessionKey(_APPID, _APPSECRET, Code);
-            if (string.IsNullOrWhiteSpace(wxJson))
-            {
-                return base.Write(EnumResponseCode.Error, "未获取到微信Session_Key信息");
-            }
-            if (!wxJson.Contains("openid"))
-            {
-                return base.Write(EnumResponseCode.Error, "Code有误或已失效");
-            }
-            WeChat_Model_XCXLoginApiJson wxModel = QZ_Helper_Json.Deserialize<WeChat_Model_XCXLoginApiJson>(wxJson);
-            WeChat_Model_WXXCXUserInfo wxUserInfo = null;
-            try
-            {
-                string wxUserInfoStr = QZ.Common.QZ_Helper_Encryption.AES_Decrypt(EncryptedData, wxModel.session_key, IV);//解密后微信用户信息
-                wxUserInfo = QZ.Common.QZ_Helper_Json.Deserialize<WeChat_Model_WXXCXUserInfo>(wxUserInfoStr);
-            }
-            catch (Exception e)
-            {
-                return base.Write(EnumResponseCode.Error, e.Message);
-            }
-            if (wxUserInfo == null)
-            {
-                return base.Write(EnumResponseCode.Error, "EncryptedData解密失败");
-            }
             lock (_obj)
             {
+                string wxJson = string.Empty;
+                wxJson = QZ_Helper_Wechat.GetAppSessionKey(_APPID, _APPSECRET, Code);
+                if (string.IsNullOrWhiteSpace(wxJson))
+                {
+                    return base.Write(EnumResponseCode.Error, "未获取到微信Session_Key信息");
+                }
+                if (!wxJson.Contains("openid"))
+                {
+                    return base.Write(EnumResponseCode.Error, "Code有误或已失效");
+                }
+                WeChat_Model_XCXLoginApiJson wxModel = QZ_Helper_Json.Deserialize<WeChat_Model_XCXLoginApiJson>(wxJson);
+                WeChat_Model_WXXCXUserInfo wxUserInfo = null;
+                try
+                {
+                    string wxUserInfoStr = QZ.Common.QZ_Helper_Encryption.AES_Decrypt(EncryptedData, wxModel.session_key, IV);//解密后微信用户信息
+                    wxUserInfo = QZ.Common.QZ_Helper_Json.Deserialize<WeChat_Model_WXXCXUserInfo>(wxUserInfoStr);
+                }
+                catch (Exception e)
+                {
+                    return base.Write(EnumResponseCode.Error, e.Message);
+                }
+                if (wxUserInfo == null)
+                {
+                    return base.Write(EnumResponseCode.Error, "EncryptedData解密失败");
+                }
+
                 QZ_Model_In_User userInfo = null;
                 if (!string.IsNullOrWhiteSpace(wxModel.unionid))
                 {
