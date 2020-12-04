@@ -215,8 +215,34 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.Error, "请输入有效手机号码~");
             }
-            model.EducationsJson = model.Educations != null ? JsonConvert.SerializeObject(model.Educations) : string.Empty;
-            model.JobsJson = model.Jobs != null ? JsonConvert.SerializeObject(model.Jobs) : string.Empty;
+            if (string.IsNullOrEmpty(model.EducationsJson))
+            {
+                return base.Write(EnumResponseCode.Error, "请输入教育经历");
+            }
+            else
+            {
+                try
+                {
+                    model.Educations = JsonConvert.DeserializeObject<List<Interview_UserEducation>>(model.EducationsJson);
+                }
+                catch (Exception)
+                {
+                    return base.Write(EnumResponseCode.Error, "教育经历有误");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(model.JobsJson))
+            {
+                try
+                {
+                    model.Jobs = JsonConvert.DeserializeObject<List<Interview_UserHistoryJob>>(model.JobsJson);
+                }
+                catch (Exception)
+                {
+                    return base.Write(EnumResponseCode.Error, "工作经历有误");
+                }
+            }
+            //model.EducationsJson = model.Educations != null ? JsonConvert.SerializeObject(model.Educations) : string.Empty;
+            //model.JobsJson = model.Jobs != null ? JsonConvert.SerializeObject(model.Jobs) : string.Empty;
             if (!_iUserBasicInfoService.SubmitBasicInfo(model, out QZ_Model_In_UserBasicInfo basicInfo))
             {
                 return base.Write(EnumResponseCode.Error, "哦噢，遇到了未知错误~");
