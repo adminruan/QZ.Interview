@@ -152,7 +152,7 @@ namespace QZ.Interview.Api
                 pairs.Add("gender", userInfo.Gender == null ? "未知" : userInfo.Gender == true ? "男" : "女");
                 pairs.Add("regDate", userInfo.AddTime.ToString("yyyy-MM-dd HH:mm:ss"));
                 pairs.Add("userToken", _iUserService.GetUserToken(userInfo));
-                return base.Write(EnumResponseCode.Success);
+                return base.Write(EnumResponseCode.Success, data: pairs);
             }
         }
         #endregion
@@ -165,6 +165,7 @@ namespace QZ.Interview.Api
                 return base.Write(EnumResponseCode.NotSignIn);
             }
             QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.GetBasicInfo(UserID);
+            QZ_Model_In_InterviewRecords interviewRecordInfo = _iInterviewRecordsService.GetNewInterviewInfoByUID(UserID) ?? new QZ_Model_In_InterviewRecords();
             if (basicInfo == null)
             {
                 return base.Write(EnumResponseCode.Error, "暂无信息");
@@ -185,7 +186,9 @@ namespace QZ.Interview.Api
             catch (Exception)
             {
             }
-            return base.Write(basicInfo, "ID|Educations|Jobs|ExtInterviewID|ExtInterviewDate|ExtSchedule|ExtAdminIds", false);
+            basicInfo.ExtInterviewID = interviewRecordInfo.ID;
+            basicInfo.ExtSchedule = interviewRecordInfo.Schedule;
+            return base.Write(basicInfo, "ID|Educations|Jobs|ExtInterviewDate|ExtAdminIds", false);
         }
         #endregion
 

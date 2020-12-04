@@ -88,6 +88,13 @@ namespace QZ.Interface.Interview_IService
         /// <param name="userIds"></param>
         /// <returns></returns>
         List<(int, int)> GetInterviewTimesByUIDS(List<int> userIds);
+
+        /// <summary>
+        /// 通过用户ID获取用户最新一条面试记录
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        QZ_Model_In_InterviewRecords GetNewInterviewInfoByUID(int uid);
         #endregion
     }
 }

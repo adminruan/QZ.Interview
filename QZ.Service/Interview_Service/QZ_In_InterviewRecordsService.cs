@@ -270,6 +270,16 @@ namespace QZ.Service.Interview_Service
         {
             return _InterviewRecords.Where(p => userIds.Contains(p.UserID)).GroupBy(p => p.UserID).Select(p => ValueTuple.Create(p.Key, p.Count())).ToList();
         }
+
+        /// <summary>
+        /// 通过用户ID获取用户最新一条面试记录
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public QZ_Model_In_InterviewRecords GetNewInterviewInfoByUID(int uid)
+        {
+            return _InterviewRecords.Where(p => p.UserID == uid).OrderByDescending(p => p.ID).FirstOrDefault();
+        }
         #endregion
     }
 }
