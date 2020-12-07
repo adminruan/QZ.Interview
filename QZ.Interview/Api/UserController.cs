@@ -294,7 +294,7 @@ namespace QZ.Interview.Api
             //使用题多多合伙人appid和appsecret
             if (!QZ_Helper_Wechat.GetAccessToken(out string accessToken, "wx0d13958f771fb415", "b4a9317fc2f33f915a4f154e68e6050b"))
             {
-                return base.Write(EnumResponseCode.Error, "AccessToken 获取异常");
+                return base.Write(EnumResponseCode.Error, "AccessToken 获取异常", new Dictionary<string, string>() { { "ErroMsg", accessToken } });
             }
             //获取生成二维码票据
             try
