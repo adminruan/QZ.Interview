@@ -164,7 +164,7 @@ namespace QZ.Interview.Api
             {
                 return base.Write(EnumResponseCode.NotSignIn);
             }
-            QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.GetBasicInfo(UserID);
+            QZ_Model_In_UserBasicInfo basicInfo = _iUserBasicInfoService.GetBasicInfo(UserID) ?? new QZ_Model_In_UserBasicInfo(); ;
             QZ_Model_In_InterviewRecords interviewRecordInfo = _iInterviewRecordsService.GetNewInterviewInfoByUID(UserID) ?? new QZ_Model_In_InterviewRecords();
             if (basicInfo == null)
             {
