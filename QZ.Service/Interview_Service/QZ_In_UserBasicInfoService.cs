@@ -69,6 +69,7 @@ namespace QZ.Service.Interview_Service
                     model.ArriveTime = info.ArriveTime;
                     model.ResumeSource = info.ResumeSource;
                     model.Updatetime = DateTime.Now;
+                    model.Relation = info.Relation;
                     base.Update(model);
                 }
                 else
@@ -99,6 +100,7 @@ namespace QZ.Service.Interview_Service
                     model.ResumeSource = info.ResumeSource;
                     model.AddTime = DateTime.Now;
                     model.Updatetime = DateTime.Now;
+                    model.Relation = info.Relation;
                     base.Insert(model);
                 }
                 basicInfo = model;
