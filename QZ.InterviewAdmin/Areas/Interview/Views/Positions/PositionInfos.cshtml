@@ -31,7 +31,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <button class="layui-btn layui-btn-md layui-bg-green" data-method="search"><i class="layui-icon">&#xe615;</i> 搜索</button>
+                            <button class="layui-btn layui-btn-md layui-btn-normal" data-method="search"><i class="layui-icon">&#xe615;</i> 搜索</button>
                         </div>
                         <div class="layui-row">
                             <table id="tab-position" lay-filter="lay-position"></table>
@@ -44,12 +44,12 @@
     @*头部工具栏*@
     <script type="text/html" id="toolbar">
         <div class="layui-btn-container">
-            <button class="layui-btn layui-btn-sm" lay-event="add" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i> 添加</button>
+            <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i> 添加</button>
         </div>
     </script>
     @*行内工具栏*@
     <script type="text/html" id="linebar">
-        <a class="layui-btn layui-btn-sm" lay-event="event-edit" style="line-height:28px">编辑</a>
+        <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="event-edit" style="line-height:28px">编辑</a>
     </script>
     <script type="text/javascript">
         var active, $, layer, table;
