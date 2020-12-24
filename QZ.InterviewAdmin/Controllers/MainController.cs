@@ -26,6 +26,7 @@ namespace QZ.InterviewAdmin.Controllers
             }
             else
             {
+                ViewBag.UserName = adminInfo.RealName;
                 return View(this.GetIndexInfo());
             }
         }

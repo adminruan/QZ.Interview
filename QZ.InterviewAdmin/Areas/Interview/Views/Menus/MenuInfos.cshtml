@@ -64,7 +64,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <button class="layui-btn layui-btn-md layui-bg-green" id="btn-search" onclick="active.search()"> <i class="layui-icon">&#xe615;</i> 搜索</button>
+                            <button class="layui-btn layui-btn-normal" id="btn-search" onclick="active.search()"> <i class="layui-icon">&#xe615;</i> 搜索</button>
                         </div>
                         <div class="layui-row">
                             <table id="tab-menu" lay-filter="lay-menu"></table>
@@ -77,13 +77,13 @@
     @*头部工具栏*@
     <script type="text/html" id="toolbar">
         <div class="layui-btn-container">
-            <button class="layui-btn layui-btn-sm" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i>添加</button>
+            <button class="layui-btn layui-btn-normal layui-btn-sm" onclick="active.openedit();"><i class="layui-icon">&#xe654;</i>添加</button>
             <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="active.goback();"><i class="layui-icon">&#xe65c;</i>返回</button>
         </div>
     </script>
     @*行内工具*@
     <script type="text/html" id="inlinebar">
-        <a class="layui-btn layui-btn-sm" lay-event="e-update" style="line-height:28px">编辑</a>
+        <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="e-update" style="line-height:28px">编辑</a>
     </script>
 
     <script type="text/javascript">
@@ -187,6 +187,7 @@
             openedit: function (pid, id) {
                 layer.open({
                     type: 2,
+                    skin: 'demo-class',
                     closeBtn: 2,
                     title: '菜单编辑',
                     area: ['550px', '390px'],
