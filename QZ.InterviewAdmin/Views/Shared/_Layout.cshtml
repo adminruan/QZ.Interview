@@ -182,12 +182,12 @@
             var keys = document.cookie.match(/[^ =;]+(?==)/g);
             if (keys) {
                 for (var i = keys.length; i--;) {
-                    if (keys[i] == 'AdminUserInfo') {
+                    if (keys[i] == 'CurrentUser') {
                         document.cookie = keys[i] + '=;path=/;domain=' + document.domain + ';expires=' + new Date(0).toUTCString();
                     }
                 }
             }
-            window.location.href = "/Login/Clear";
+            window.location.href = "/Login/Index";
         }
     </script>
     @RenderSection("Scripts", required: false)

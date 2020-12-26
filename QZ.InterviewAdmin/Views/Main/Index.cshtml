@@ -15,36 +15,79 @@
 </style>
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
-        <div class="layui-col-sm6">
+        <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">本月</div>
+                <div class="layui-card-header">今日应聘信息</div>
                 <div class="layui-card-body">
-                    <div class="month">
-                        <p class="position">应聘人数 <span style=" font-size: 35px;">@Model.Item1</span>人</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="layui-col-sm6">
-            <div class="layui-card">
-                <div class="layui-card-header">今日应聘人员</div>
-                <div class="layui-card-body">
-                    <div class="layui-row">
-                        @{
-                            foreach (var item in Model.Item2)
-                            {
-                                <div class="layui-col-xs6" style="margin-top:15px;">
-                                    <div class="grid-demo grid-demo-bg1">
-                                        <span class="position">@item.Key</span> <span class="position">@item.Value 人</span>
-                                    </div>
-                                </div>
+                    <div class="layui-carousel layadmin-carousel layadmin-backlog" lay-anim="" lay-indicator="inside" lay-arrow="none" style="width: 100%; height: 280px;">
+                        <div carousel-item="">
+                            @{
+                                var groupNum = Model.Item2.Count / 8;
+                                if (Model.Item2.Count % 8 > 0)
+                                {
+                                    groupNum += 1;
+                                }
+                                int i = 0;
+                                while (groupNum > 0)
+                                {
+                                    i++;
+                                    var thisClass = i == 1 ? "layui-this" : "";
+                                    <ul class="layui-row layui-col-space10 @thisClass" data-index="@i">
+                                        @foreach (var item in Model.Item2.Skip((i - 1) * 8).Take(8))
+                                        {
+                                            <li class="layui-col-xs3">
+                                                <a href="javascript:;" class="layadmin-backlog-body">
+                                                    <h3>@item.Key</h3>
+                                                    <p><cite>@item.Value</cite>人</p>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                    groupNum--;
+                                }
                             }
-                        }
-                        <p style="margin-top:10px;">共 @Model.Item3 人</p>
+                        </div>
+                        <div class="layui-carousel-ind">
+                            <ul>
+                                <li class="layui-this" data-index="1"></li>
+                                @{
+                                    var groupNum2 = Model.Item2.Count / 8;
+                                    if (Model.Item2.Count % 8 > 0)
+                                    {
+                                        groupNum2 += 1;
+                                    }
+                                    groupNum2 -= 1;
+                                    for (int n = 0; n < groupNum2; n++)
+                                    {
+                                        <li class="" data-index="@(n + 2)"></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".layui-fluid .layui-carousel-ind li").click(function () {
+            //ul li当前选中更改d
+            var that = this;
+            $(this).addClass("layui-this").siblings().removeClass("layui-this");
+            var index = $(that).data("index");
+            //联动切换ul面板
+            var panelUls = $(".layui-fluid .layui-carousel ul");
+            panelUls.removeClass("layui-this");
+            panelUls.each((i, e) => {
+                if ($(e).data("index") == index) {
+                    $(e).addClass("layui-this");
+                    return;
+                }
+            });
+        });
+    });
+</script>
 
