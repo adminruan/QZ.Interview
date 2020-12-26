@@ -43,6 +43,23 @@ namespace QZ.Service.Interview_Service
                 return 0;
             }
         }
+
+        /// <summary>
+        /// 通过ID向上递归获取父菜单信息
+        /// 包含本机菜单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<QZ_Model_In_Menu> GetParentsByID(int id)
+        {
+            string sql = $@"WITH Temp AS(
+SELECT * FROM [dbo].[In_Menu] WHERE ID={id}
+UNION ALL
+SELECT M.* FROM [dbo].[In_Menu] AS M INNER JOIN Temp ON M.ID=Temp.ParentID
+)
+SELECT * FROM Temp ORDER BY ID";
+            return base.ExcuteQuery<QZ_Model_In_Menu>(sql);
+        }
         #endregion
     }
 }

@@ -66,6 +66,15 @@
                             </div>
                             <button class="layui-btn layui-btn-normal" id="btn-search" onclick="active.search()"> <i class="layui-icon">&#xe615;</i> 搜索</button>
                         </div>
+                        <div class="layui-row" style="margin-top:10px;" id="navigation" hidden="hidden">
+                            <div class="layui-inline">
+                                <span class="layui-breadcrumb">
+                                    @*<a href="/">首页</a>
+                                        <a href="/demo/">演示</a>
+                                        <a><cite>导航元素</cite></a>*@
+                                </span>
+                            </div>
+                        </div>
                         <div class="layui-row">
                             <table id="tab-menu" lay-filter="lay-menu"></table>
                         </div>
@@ -87,10 +96,11 @@
     </script>
 
     <script type="text/javascript">
-        var $, layer, table;
-        layui.use(['layer', 'table', 'form', 'laydate'], function () {
+        var $, layer, table, historyData = new Array();
+        layui.use(['layer', 'table', 'form', 'laydate', 'element'], function () {
             var form = layui.form
-                , laydate = layui.laydate;
+                , laydate = layui.laydate
+                , element = layui.element;
             $ = layui.jquery, layer = layui.layer, table = layui.table;
             //初始化
             active.setTab(0);
@@ -131,7 +141,7 @@
                     , toolbar: '#toolbar'
                     , cols: [[ //表头
                         { field: 'ID', sort: true, title: '编号', align: 'center' }
-                        , { field: 'MenuName', title: '菜单名称', align: 'center', templet: function (d) { return '<a target="_blank" class="hoverStyle" title="查看子菜单" onclick="active.subset(' + d.ID + ')"><i class="layui-icon layui-icon-template-1"> </i>' + d.MenuName + '</a>' } }
+                        , { field: 'MenuName', title: '菜单名称', align: 'center', templet: function (d) { return '<a target="_blank" class="hoverStyle" title="查看子菜单" onclick="active.subset(' + d.ID + ',this)"><i class="layui-icon layui-icon-template-1"> </i>' + d.MenuName + '</a>' } }
                         , { field: 'PathUrl', title: '菜单地址', align: 'center', templet: function (d) { return (d.PathUrl == '' || d.PathUrl == ' ' || d.PathUrl == null) ? "--" : d.PathUrl; } }
                         , { field: 'SortNumber', title: '排序序号', align: 'center' }
                         , {
@@ -158,12 +168,16 @@
                     data.pid = $('#PID').val();
                 }
                 that.setTab(data.pid);
+                //historyData = new Array();
+                DrawingNavigation(data.pid);
             },
             //查看子集
-            subset: function (pid) {
+            subset: function (pid, t) {
                 var that = this;
                 data.pid = pid;
                 that.setTab(data.pid);
+                //historyData.push({ pid: pid, pname: t.innerText });
+                DrawingNavigation(pid);
             },
             //返回上一层
             goback: function () {
@@ -176,6 +190,8 @@
                         success: function (p) {
                             data.pid = p;
                             that.setTab(data.pid);
+                            //historyData.pop();
+                            DrawingNavigation(p);
                         },
                         fail: function () {
                             layer.msg('未知错误，请联系管理员');
@@ -203,6 +219,39 @@
             var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
             parent.layer.close(index); //再执行关闭
         };
+
+        //渲染导航
+        function DrawingNavigation(menuid) {
+            $.ajax({
+                url: '/Interview/Menus/GetParentsByID',
+                method: 'GET',
+                data: { 'id': menuid },
+                dataType: 'JSON',
+                success: function (res) {
+                    if (res && res.length > 0) {
+                        $("#navigation").removeAttr("hidden");
+                        var nav = "";
+                        nav += '<a href="javascript:;" onclick="active.subset(0,this)">首页</a>';
+                        nav += '<span lay-separator="">/</span>';
+                        $(res).each((i, e) => {
+                            if (i + 1 != res.length) {
+                                nav += '<a href="javascript:;" onclick="active.subset(' + e.Item1 + ',this)">' + e.Item2 + '</a>';
+                                nav += '<span lay-separator="">/</span>';
+                            } else {
+                                //最后一个
+                                nav += '<a href="javascript:;"><cite>' + e.Item2 + '</cite></a>';
+                            }
+                        });
+                        $("#navigation .layui-breadcrumb").html(nav);
+                    } else {
+                        $('#navigation').attr("hidden", "hidden");
+                    }
+                },
+                fail: function () {
+                    layer.msg('未知错误，请联系管理员');
+                }
+            });
+        }
     </script>
 </body>
 </html>

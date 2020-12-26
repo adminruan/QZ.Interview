@@ -20,6 +20,14 @@ namespace QZ.Interface.Interview_IService
         /// <param name="pid"></param>
         /// <returns></returns>
         int GetMaxSortNumberByParentID(int pid);
+
+        /// <summary>
+        /// 通过ID向上递归获取父菜单信息
+        /// 包含本机菜单
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        List<QZ_Model_In_Menu> GetParentsByID(int id);
         #endregion
     }
 }

@@ -88,6 +88,23 @@ namespace QZ.InterviewAdmin.Areas.Interview.Controllers
             QZ_Model_In_Menu menu = _iMenuService.Find<QZ_Model_In_Menu>(id);
             return menu?.ParentID ?? 0;
         }
+
+        /// <summary>
+        /// 获取当前菜单所有父菜单信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Area("Interview")]
+        public IActionResult GetParentsByID(int id)
+        {
+            var parents = _iMenuService.GetParentsByID(id);
+            if (parents == null || parents.Count == 0)
+            {
+                parents = new List<QZ_Model_In_Menu>();
+            }
+            var data = parents.Select(p => ValueTuple.Create(p.ID, p.MenuName)).ToList();
+            return ContentResult(data);
+        }
         #endregion
 
         #region 菜单编辑

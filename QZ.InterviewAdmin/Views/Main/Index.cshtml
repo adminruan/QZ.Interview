@@ -17,7 +17,12 @@
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">
             <div class="layui-card">
-                <div class="layui-card-header">今日应聘信息</div>
+                <div class="layui-card-header" style="height:85px;">
+                    应聘信息 @("\n")
+                    <br />
+                    <span style="color:orange;">今日：<cite style="font-size:22px;">@Model.Item3</cite>人</span>
+                    <span style="color:#0bb0ff;">本月：<cite style="font-size:22px;">@Model.Item1</cite>人</span>
+                </div>
                 <div class="layui-card-body">
                     <div class="layui-carousel layadmin-carousel layadmin-backlog" lay-anim="" lay-indicator="inside" lay-arrow="none" style="width: 100%; height: 280px;">
                         <div carousel-item="">
@@ -36,7 +41,7 @@
                                         @foreach (var item in Model.Item2.Skip((i - 1) * 8).Take(8))
                                         {
                                             <li class="layui-col-xs3">
-                                                <a href="javascript:;" class="layadmin-backlog-body">
+                                                <a href="javascript:;" onclick="layer.tips('不跳转', this, {tips: 3});" class="layadmin-backlog-body">
                                                     <h3>@item.Key</h3>
                                                     <p><cite>@item.Value</cite>人</p>
                                                 </a>
