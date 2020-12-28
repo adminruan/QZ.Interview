@@ -116,8 +116,30 @@ namespace QZ.Interview.Api
             int totalPage = data.Count().CalculateTotalPageNumber(20);
             Dictionary<string, string> pairs = new Dictionary<string, string>();
             //我的待处理数量、已处理数量
-            pairs.Add("pendings", _iInterviewRecordsService.GetDataInterview().Where(awaitExpression).Count().ToString());
-            pairs.Add("prosesseds", _iInterviewRecordsService.GetDataInterview().Where(p => p.ExtAdminIds.Contains(adminInfo.AdminID.ToString()) && p.ExtSchedule > (int)QZ_Enum_Schedules.PendingApproval).Count().ToString());
+            Expression<Func<QZ_Model_In_UserBasicInfo, bool>> awaitWhere = p => true;
+            switch (adminInfo.Position)
+            {
+                case (int)QZ_Enum_Positions.Administrative:
+                    {
+                        //行政-待分配、需要我处理的面试
+                        awaitWhere = awaitExpression.And(p => p.ExtSchedule < (int)QZ_Enum_Schedules.PendingApproval || (p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|") && p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval));
+                    }
+                    break;
+                case (int)QZ_Enum_Positions.Boss:
+                    {
+                        //总经理-可查看所有权限
+                        awaitWhere = awaitExpression.And(p => p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval);
+                    }
+                    break;
+                default:
+                    {
+                        //其它角色-需要我处理的面试
+                        awaitWhere = awaitExpression.And(p => p.ExtAdminIds.EndsWith(adminInfo.AdminID + "|") && p.ExtSchedule <= (int)QZ_Enum_Schedules.PendingApproval);
+                    }
+                    break;
+            }
+            pairs.Add("pendings", _iInterviewRecordsService.GetDataInterview().Where(awaitWhere).Count().ToString());//待处理
+            pairs.Add("prosesseds", _iInterviewRecordsService.GetDataInterview().Where(p => p.ExtAdminIds.Contains(adminInfo.AdminID.ToString()) && p.ExtSchedule > (int)QZ_Enum_Schedules.PendingApproval).Count().ToString());//已处理
             pairs.Add("page", Page.ToString());
             pairs.Add("limit", "20");
             pairs.Add("totalPages", totalPage.ToString());
