@@ -66,8 +66,7 @@ namespace QZ.Interview.Api
             }
             catch (Exception e)
             {
-
-                throw e;
+                return base.Write(EnumResponseCode.Error, $"内部异常：{e.Message}");
             }
         }
         #endregion
