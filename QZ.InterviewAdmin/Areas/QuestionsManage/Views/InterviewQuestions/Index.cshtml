@@ -1,0 +1,296 @@
+﻿@{
+    ViewData["Title"] = "面试题整理";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>面试题整理</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <style>
+        .topnav {
+            margin-left: 8px;
+        }
+
+        .curnav {
+            border: 1px solid #03A9F4;
+            border-radius: 50%;
+            padding: 5px;
+            margin-left: 8px;
+        }
+
+        a {
+            cursor: pointer;
+        }
+
+            a:hover {
+                color: red;
+                text-decoration-line: underline;
+            }
+
+        .layui-table-cell {
+            height: 40px;
+            overflow: visible;
+        }
+
+        .layui-table-box {
+            overflow: visible;
+        }
+
+        .layui-table-body {
+            overflow: visible;
+        }
+
+        .layui-table, .layui-table-view {
+            margin: 0px;
+            margin-top: -10px;
+        }
+
+            .layui-table-view .layui-table td, .layui-table-view .layui-table th {
+                padding: 2px 0;
+                border-top: none;
+                border-left: none;
+                height: 41px;
+            }
+
+        .layui-table-cell {
+            white-space: normal;
+            height: auto;
+            line-height: 20px;
+            font-size: 14px;
+            padding-right: 0px;
+        }
+
+        .layui-table th {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .layui-table td, .layui-table th {
+            border-style: none;
+            border-bottom: 1px solid #E1EEFF;
+        }
+
+        .layui-table td {
+            font-size: 12px;
+        }
+
+        .layui-tab-title {
+            position: relative;
+            left: 0px;
+            height: 30px;
+            white-space: nowrap;
+            font-size: 0px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            transition: all 0.2s ease 0s;
+        }
+
+            .layui-tab-title .layui-this::after {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+                content: "";
+                width: 100%;
+                height: 30px;
+                border-bottom-color: rgb(255, 255, 255);
+                box-sizing: border-box;
+                pointer-events: none;
+                border-width: 1px;
+                border-style: solid;
+                border-radius: 2px 2px 0px 0px;
+            }
+
+            .layui-tab-title li {
+                display: inline-block;
+                vertical-align: middle;
+                font-size: 14px;
+                position: relative;
+                line-height: 25px;
+                min-width: 65px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.2s ease 0s;
+                padding: 0px 15px;
+            }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card-header title">
+            <strong> >>快速检索：   状态(默认全部)：</strong>
+            <a onclick="TableReload(1, this);">已启用试题</a>
+            <a class="topnav" onclick="TableReload(0, this);">禁用试题</a>
+            <strong style="margin-left:20px;">试题id或标题：</strong>
+            <div class="layui-inline" style="width:15%;">
+                <input type="text" id="xval" name="xval" placeholder="请输入关键词" class="layui-input">
+            </div>
+            <button class="layui-btn layui-btn-md layui-bg-green" onclick="Search();" title="根据条件搜索"> <i class="layui-icon">&#xe615;</i></button>
+        </div>
+        @*用户数据表格*@
+        <table class="layui-hide" id="InQuestionTab" lay-filter="InQuestionTab"></table>
+        @*头部工具栏*@
+        <script type="text/html" id="Intoolbar">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-sm layui-btn-normal" title="添加试题" lay-event="addst"><i class="layui-icon">&#xe654;</i></button>
+                <button class="layui-btn layui-btn-sm" title="启用试题" lay-event="enablest">启用</button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger" title="禁用试题" lay-event="disablest">禁用</button>
+            </div>
+        </script>
+        @*行内工具栏*@
+        <script type="text/html" id="Inbar">
+            <a class="layui-btn layui-btn-xs" lay-event="edit" title="编辑"><i class="layui-icon">&#xe642;</i></a>
+            {{# if(d.verific==1){ }}
+            <a lay-event="disablest" title="禁用试题"><font color="green">已启用</font></a>
+            {{# }else { }}
+            <a lay-event="enablest" title="启用试题"><font color="red">已禁用</font></a>
+            {{# } }}
+            @{
+                var gid = ViewBag.GroupID;
+                if (gid == 18 || gid == 19 || gid == 1042)
+                {
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" title="删除"><i class="layui-icon">&#xe640;</i></a>
+                }
+            }
+        </script>
+    </div>
+    <script>
+        var $; var layer; var table; var loadindex;
+        layui.use(['layer', 'table', 'form'], function () {
+            $ = layui.jquery; layer = layui.layer; table = layui.table;
+            var form = layui.form;
+            layer.config({
+                skin: 'layui-layer-molv'
+            });
+            loadindex = showLoad("加载中...");
+            table.render({
+                elem: '#InQuestionTab'
+                , url: '/QuestionsManage/InterviewQuestions/GetInterQuestionList'
+                , title: '面试题整理'
+                , page: true
+                , limit: 20
+                , limits: [20, 50, 100]
+                , toolbar: '#Intoolbar'
+                , cols: [[ //表头
+                    { type: 'checkbox' }
+                    , {
+                        field: '', title: '题目名称', align: 'left', templet: function (d) {
+                            var restr = "";
+                            restr += "<a onclick='openwin(" + d.id + ");'>";
+                            if (d.sttx != null && d.sttx != "") {
+                                restr += '<font color="green">[' + d.sttx + ']</font>';
+                            }
+                            restr += "<font title='" + d.id + "'> " + d.title + "</font></a>";
+                            return restr;
+                        }
+                    }
+                    , {
+                        field: 'tmtype', title: '题目类型', align: 'left', width: '10%', templet: function (d) {
+                            switch (d.tmtype) {
+                                case 1:
+                                    return '单项选择题';
+                                case 2:
+                                    return '多项选择题';
+                                case 3:
+                                    return '不定项选择';
+                                case 4:
+                                    return '判断题';
+                                case 5:
+                                    return '报关编码';
+                                case 6:
+                                    return '填空题';
+                                case 7:
+                                    return '问答题';
+                                case 8:
+                                    return '论述题';
+                                case 9:
+                                    return '案例分析题';
+                                case 10:
+                                    return '共用题干题';
+                                case 11:
+                                    return '比较题';
+                                case 12:
+                                    return '配伍题';
+                                case 13:
+                                    return '名词解释';
+                                case 15:
+                                    return 'A3型题'
+                                case 16:
+                                    return 'A4型题';
+                                case 17:
+                                    return 'A3/A4型题';
+                                default:
+                                    return "";
+                            }
+                        }
+                    }
+                    , { field: 'keywords', title: '关键词', align: 'left', width: '15%' }
+                    , {
+                        field: '', title: '标准答案', align: 'center', width: '15%', templet: function (d) {
+                            if (d.Answer == null || d.ctype == 6) { return "---"; }
+                            if (d.tmtype == 4) { if (d.Answer == 1) { return '对'; } else if (d.Answer == 0) { return '错'; } }
+                            if (d.tmtype == 1 || d.tmtype == 2 || d.tmtype == 3) { return d.Answer; } else { return "---"; }
+                        }
+                    }
+                    , { field: '', title: '解释', align: 'center', width: '6%', templet: function (d) { if (d.DAJS != "" && d.DAJS != null) { return '有' } else { return '无' } } }
+                ]]
+                , done: function (res, curr, count) {
+                    layer.close(loadindex);
+                }
+            });
+        });
+        //加载层
+        function showLoad(mstr) {
+            return layer.load(2, { //icon支持传入0-2
+                shade: [0.5, '#f5f5f5'], //0.5透明度的灰色背景
+                content: mstr,
+                success: function (layero) {
+                    layero.find('.layui-layer-content').css({
+                        'padding-top': '39px',
+                        'width': '100px'
+                    });
+                }
+            });
+        }
+        //试题数据检索
+        function TableReload(num, obj) {
+            loadindex = showLoad("加载中...");
+            $(obj).attr("class", "curnav");
+            $(obj).siblings().removeClass("curnav");
+            table.reload('InQuestionTab', {
+                where: { "verific": num }
+                , page: { curr: 1 }
+                , done: function (res, curr, count) {
+                    layer.close(loadindex);
+                }
+            });
+        }
+        function Search() {
+            loadindex = showLoad("加载中...");
+            table.reload('InQuestionTab', {
+                where: { "stval": $("#xval").val() }
+                , page: { curr: 1 }
+                , done: function (res, curr, count) {
+                    layer.close(loadindex);
+                }
+            });
+        }
+        //编辑试题
+        function openwin(id) {
+            var str = "/PluralismManage/PluralismBank/SupplementForm?id=" + id + "&xdarr=" + idlist + "&sourceid=0";
+            layer.open({
+                type: 2,
+                closeBtn: 1,
+                title: '编辑信息',
+                area: ['1080px', '650px'],
+                maxmin: true,
+                content: str
+            });
+        }
+
+
+    </script>
+</body>
+</html>

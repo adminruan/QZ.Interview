@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -97,6 +98,24 @@ namespace QZ.InterviewAdmin.Controllers
                 message = string.IsNullOrWhiteSpace(message) ? code.GetEnumDescription() : message
             };
             return Json(json);
+        }
+        #endregion
+        #region 判断是数字还是文字
+        public bool IsNumeric(string str) //接收一个string类型的参数,保存到str里
+        {
+            if (str == null || str.Length == 0)    //验证这个参数是否为空
+                return false;                           //是，就返回False
+            ASCIIEncoding ascii = new ASCIIEncoding();//new ASCIIEncoding 的实例
+            byte[] bytestr = ascii.GetBytes(str);         //把string类型的参数保存到数组里
+
+            foreach (byte c in bytestr)                   //遍历这个数组里的内容
+            {
+                if (c < 48 || c > 57)                          //判断是否为数字
+                {
+                    return false;                              //不是，就返回False
+                }
+            }
+            return true;                                        //是，就返回True
         }
         #endregion
     }
