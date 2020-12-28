@@ -39,6 +39,7 @@ namespace QZ.Common
         /// appsettings.json文件必须位于根目录或与bin文件夹同级目录
         /// </para>
         /// </summary>
+        /// <param name="key">键名</param>
         public static string GetSectionValue(string key)
         {
             return _configuration.GetSection(key).Value;
