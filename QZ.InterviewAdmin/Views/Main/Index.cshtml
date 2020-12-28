@@ -41,7 +41,7 @@
                                         @foreach (var item in Model.Item2.Skip((i - 1) * 8).Take(8))
                                         {
                                             <li class="layui-col-xs3">
-                                                <a href="javascript:;" onclick="layer.tips('不跳转', this, {tips: 3});" class="layadmin-backlog-body">
+                                                <a href="javascript:;" @*onclick="layer.tips('不跳转', this, {tips: 3});"*@ class="layadmin-backlog-body">
                                                     <h3>@item.Key</h3>
                                                     <p><cite>@item.Value</cite>人</p>
                                                 </a>
